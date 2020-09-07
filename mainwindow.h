@@ -15,6 +15,8 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+private Q_SLOTS:
+
 private:
     Ui::MainWindow *ui;
 };

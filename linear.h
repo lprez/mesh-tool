@@ -1,6 +1,7 @@
 #ifndef LINEAR_H_
 #define LINEAR_H_
 
+#include <algorithm>
 #include <cmath>
 #include <initializer_list>
 
@@ -31,6 +32,11 @@ public:
 			}
 		}
 	}
+
+    // Simile al precedente ma la dimensione dev'essere quella esatta.
+    Matrix(const T (&elements)[rows * columns]) {
+        std::copy(std::begin(elements), std::end(elements), std::begin(this->elements));
+    }
 
 	// Accesso riga, colonna.
 	const T& operator() (unsigned int row, unsigned int column) const {
@@ -170,6 +176,11 @@ public:
 	const T* data_ptr() const {
 		return (const T*) elements;
 	}
+
+    size_t size() const {
+        return sizeof(elements) / sizeof(elements[0]);
+    }
+
 private:
 	// Riempie la matrice con lo stesso valore.
 	void fill(const T& value) {

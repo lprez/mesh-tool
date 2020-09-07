@@ -6,10 +6,11 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    ui->menuFile->addAction(new QAction(QIcon(), QString::fromUtf8("test"), this));
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
 }
-

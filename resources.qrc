@@ -1,2 +1,9 @@
-<!DOCTYPE RCC>
-<RCC version="1.0"/>
+<RCC>
+    <qresource prefix="/python">
+        <file>api.py</file>
+    </qresource>
+    <qresource prefix="/glsl">
+        <file>vertex.glsl</file>
+        <file>fragment.glsl</file>
+    </qresource>
+</RCC>
