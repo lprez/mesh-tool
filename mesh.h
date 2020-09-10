@@ -63,6 +63,7 @@ public:
 private:
     std::map<VertexID, Vertex> vertices;
     std::map<FaceID, Face> faces;
+    //std::multimap<VertexID, FaceID> connected_faces;
 
     std::vector<float> positions;
     std::vector<float> normals;

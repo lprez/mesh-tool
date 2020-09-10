@@ -2,35 +2,37 @@
 #include <QOpenGLContext>
 #include <QOpenGLFunctions>
 
-#include "renderwidget.h"
+#include "meshview.h"
 #include "shader.h"
 #include "mesh.h"
 #include "meshrenderer.h"
 
 // TODO togliere
-#include <Python.h>
 #include <QTextStream>
 #include <QFile>
-#include <iostream>
-#include "pythonplugin.h"
-#include "pythonmesh.h"
 
-RenderWidget::RenderWidget(QWidget *parent) : QOpenGLWidget(parent)
+MeshView::MeshView(QWidget *parent) : QOpenGLWidget(parent)
 {
-
 }
 
-RenderWidget::~RenderWidget() {
+MeshView::~MeshView() {
     delete test;
-    delete test_mesh;
+    delete renderer;
 }
 
-void RenderWidget::updateMesh()
+void MeshView::setModel(MeshModel *model)
 {
-    test_mesh->update(model->getMesh());
+    this->model = model;
+    connect(model, &MeshModel::meshChanged, this, &MeshView::updateMesh);
 }
 
-void RenderWidget::initializeGL()
+void MeshView::updateMesh()
+{
+    renderer->update(model->getMesh());
+    update();
+}
+
+void MeshView::initializeGL()
 {
     QSurfaceFormat format;
 
@@ -66,44 +68,21 @@ void RenderWidget::initializeGL()
                 );
 
 
-    std::map<VertexID, Vertex> vertices = {
-        {0, Vertex({-1, -1, 0}, {0, 0})},
-        {1, Vertex({1, -1, 0}, {0, 0})},
-        {2, Vertex({0, 1, 0}, {0, 0})}
-    };
-    std::map<FaceID, Face> faces = {
-        {0, Face(0, 1, 2)}
-    };
-    Mesh tmesh(vertices, faces);
-
-    this->setModel(new MeshModel(this, tmesh));
-
-    test_mesh = new MeshRenderer(tmesh, *test);
-
-    connect(model, &MeshModel::meshChanged, this, &RenderWidget::updateMesh);
+    renderer = new MeshRenderer(model->getMesh(), *test);
 }
 
-void RenderWidget::resizeGL(int width, int height)
+void MeshView::resizeGL(int width, int height)
 {
     QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
 
     f->glViewport(0, 0, width, height);
-
-
-
-    if (width > 1000) {
-        PythonPlugin plugin("testplugin.py");
-        std::wcout << plugin.name() << std::endl;
-        std::function<Mesh(const Mesh&)> transformer = [&plugin](const Mesh& mesh) {return plugin.run(mesh);};
-        model->transform(transformer);
-    }
 }
 
-void RenderWidget::paintGL()
+void MeshView::paintGL()
 {
     QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
 
     f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    test_mesh->render();
+    renderer->render();
 }
 

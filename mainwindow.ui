@@ -19,7 +19,7 @@
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
-     <widget class="RenderWidget" name="renderWidget"/>
+     <widget class="MeshView" name="meshView"/>
     </item>
    </layout>
   </widget>
@@ -37,15 +37,21 @@
      <string>File</string>
     </property>
    </widget>
+   <widget class="QMenu" name="menuModifica">
+    <property name="title">
+     <string>Modifica</string>
+    </property>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuModifica"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>RenderWidget</class>
+   <class>MeshView</class>
    <extends>QOpenGLWidget</extends>
-   <header location="global">renderwidget.h</header>
+   <header location="global">meshview.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

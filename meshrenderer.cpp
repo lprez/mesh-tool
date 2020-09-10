@@ -1,6 +1,6 @@
 #include "meshrenderer.h"
 
-MeshRenderer::MeshRenderer(Mesh &mesh, ShaderProgram &program)
+MeshRenderer::MeshRenderer(const Mesh &mesh, ShaderProgram &program)
     : program(program)
     , position_buffer(GL_FLOAT, 3)
     , normal_buffer(GL_FLOAT, 3)

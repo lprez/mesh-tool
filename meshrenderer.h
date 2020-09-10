@@ -9,7 +9,7 @@
 class MeshRenderer
 {
 public:
-    MeshRenderer(Mesh& mesh, ShaderProgram& program);
+    MeshRenderer(const Mesh& mesh, ShaderProgram& program);
 
     void update(const Mesh& mesh);
     void render();

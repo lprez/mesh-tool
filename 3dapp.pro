@@ -22,9 +22,9 @@ SOURCES += \
     mesh.cpp \
     meshmodel.cpp \
     meshrenderer.cpp \
+    meshview.cpp \
     pythonmesh.cpp \
     pythonplugin.cpp \
-    renderwidget.cpp \
     shader.cpp \
     vao.cpp
 
@@ -35,9 +35,9 @@ HEADERS += \
     mesh.h \
     meshmodel.h \
     meshrenderer.h \
+    meshview.h \
     pythonmesh.h \
     pythonplugin.h \
-    renderwidget.h \
     shader.h \
     vao.h
 
@@ -45,11 +45,11 @@ FORMS += \
     mainwindow.ui
 
 CONFIG += no_keywords
+QMAKE_CXXFLAGS += -fsplit-stack
 QMAKE_CXXFLAGS += $$system(python3-config --cflags)
 QMAKE_LFLAGS += $$system(python3-config --ldflags --embed)
 INCLUDEPATH += $$system(python3-config --includes)
 
-# Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
@@ -60,4 +60,12 @@ RESOURCES += \
 DISTFILES += \
     api.py \
     fragment.glsl \
+    plugins/catmullclark.py \
     vertex.glsl
+
+# Copia i plugin dalla cartella sorgente a quella di build.
+copyplugins.commands = $(COPY_DIR) $$PWD/plugins/* $$OUT_PWD/plugins/
+first.depends = $(first) copyplugins
+export(first.depends)
+export(copyplugins.commands)
+QMAKE_EXTRA_TARGETS += first copyplugins

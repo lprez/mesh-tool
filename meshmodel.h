@@ -4,7 +4,7 @@
 #include <QObject>
 #include "mesh.h"
 
-// Un modello (nel senso Model/View) della Mesh.
+// Un modello della Mesh per l'interazione con Qt.
 
 class MeshModel : public QObject
 {

@@ -38,8 +38,15 @@ Mesh pyobject_to_mesh(PyObject *pymesh)
     std::map<VertexID, Vertex> vertices;
     std::map<FaceID, Face> faces;
 
-    PyObject *pyvertices = PyMapping_Items(PyObject_GetAttrString(pymesh, "vertices")),
-             *pyfaces = PyMapping_Items(PyObject_GetAttrString(pymesh, "faces"));
+    PyObject *pyvertex_map = PyObject_GetAttrString(pymesh, "vertices"),
+             *pyface_map = PyObject_GetAttrString(pymesh, "faces");
+
+    if (!pyvertex_map || !pyface_map) {
+        throw std::runtime_error("Oggetto Mesh malformato (manca vertices o faces)");
+    }
+
+    PyObject *pyvertices = PyMapping_Items(pyvertex_map),
+             *pyfaces = PyMapping_Items(pyface_map);
 
     if (!pyvertices || !pyfaces) {
         throw std::runtime_error("Oggetto Mesh malformato (vertices o faces non è un dictionary)");
@@ -66,8 +73,6 @@ Mesh pyobject_to_mesh(PyObject *pymesh)
                                               pytuple_to_vector<2>(pyuv))));
 
         Py_DECREF(tuple);
-        Py_DECREF(pyvertexid);
-        Py_DECREF(pyvertex);
         Py_DECREF(pyposition);
         Py_DECREF(pyuv);
     }
@@ -95,8 +100,6 @@ Mesh pyobject_to_mesh(PyObject *pymesh)
                                          (VertexID) PyNumber_AsSsize_t(pyv3, nullptr))));
 
         Py_DECREF(tuple);
-        Py_DECREF(pyfaceid);
-        Py_DECREF(pyface);
         Py_DECREF(pyv1);
         Py_DECREF(pyv2);
         Py_DECREF(pyv3);
@@ -104,6 +107,8 @@ Mesh pyobject_to_mesh(PyObject *pymesh)
 
     Py_DECREF(pyvertices);
     Py_DECREF(pyfaces);
+    Py_DECREF(pyvertex_map);
+    Py_DECREF(pyface_map);
 
     return Mesh(vertices, faces);
 }
@@ -135,6 +140,7 @@ PyObject *mesh_to_pyobject(const Mesh &mesh)
         );
 
         PyObject_SetItem(pyvertices, PyLong_FromUnsignedLong(it->first), pyvertex);
+        Py_DECREF(pyvertex);
     }
 
     for (auto it = faces.begin(); it != faces.end(); it++) {
@@ -149,6 +155,7 @@ PyObject *mesh_to_pyobject(const Mesh &mesh)
 
 
         PyObject_SetItem(pyfaces, PyLong_FromUnsignedLong(it->first), pyface);
+        Py_DECREF(pyface);
     }
 
     Py_DECREF(apimodule);

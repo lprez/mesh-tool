@@ -7,13 +7,14 @@
 #include "meshmodel.h"
 #include "meshrenderer.h"
 
+// Un Widget che rappresenta lo spazio 3D in cui viene visualizzata la mesh.
 
-class RenderWidget : public QOpenGLWidget
+class MeshView : public QOpenGLWidget
 {
 public:
-    RenderWidget(QWidget *parent = 0);
-    ~RenderWidget();
-    void setModel(MeshModel *model) { this->model = model; }
+    MeshView(QWidget *parent = 0);
+    ~MeshView();
+    void setModel(MeshModel *model);
 
 public Q_SLOTS:
     void updateMesh();
@@ -25,10 +26,10 @@ protected:
 
 private:
     MeshModel *model;
+    MeshRenderer *renderer;
 
     // TODO togliere
     ShaderProgram *test;
-    MeshRenderer *test_mesh;
 };
 
 #endif // RENDERWIDGET_H
