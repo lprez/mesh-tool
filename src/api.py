@@ -6,6 +6,7 @@ class Vertex:
     def __repr__(self):
         return "Vertex(({}, {}, {}), ({}, {}))".format(*self.position, *self.uv)
 
+    # Somma delle posizioni e delle coordinate UV
     def __add__(self, other):
         position = ( self.position[0] + other.position[0],
                      self.position[1] + other.position[1],
@@ -16,6 +17,7 @@ class Vertex:
              )
         return Vertex(position, uv)
 
+    # Moltiplicazione delle posizioni per un fattore
     def scale(self, factor):
         position = ( self.position[0] * factor,
                      self.position[1] * factor,
@@ -34,6 +36,11 @@ class Face:
 
     def __repr__(self):
         return "Face({}, {}, {})".format(self.v1, self.v2, self.v3)
+
+    # Converte una faccia con quattro lati in due facce con tre lati
+    def quad_to_triangles(vertices):
+        return [ Face(vertices[0], vertices[1], vertices[2]),
+                 Face(vertices[0], vertices[2], vertices[3]) ]
 
 class Mesh:
     def __init__(self, vertices={}, faces={}):

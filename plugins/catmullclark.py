@@ -1,4 +1,3 @@
-import itertools
 from api import *
 
 # Calcola la media delle coordinate di una lista di vertici
@@ -14,10 +13,6 @@ def vertex_average(vertices):
 
     return result
 
-# Converte una faccia con quattro lati in due facce con tre lati
-def quad_to_triangles(vertices):
-    return [ Face(vertices[0], vertices[1], vertices[2]),
-             Face(vertices[0], vertices[2], vertices[3]) ]
 
 class CatmullClarkPlugin(TransformerPlugin):
     def __call__(self, mesh):
@@ -49,6 +44,7 @@ class CatmullClarkPlugin(TransformerPlugin):
         face_points = { face_id : vertex_average([vertices[face.v1], vertices[face.v2], vertices[face.v3]])
                         for face_id, face in faces.items()
                       }
+        # I punti medi faranno parte dei vertici della nuova mesh, dunque bisogna assegnare loro un nuovo ID
         face_point_ids = {face_id : next_vertex_id + face_id for face_id, face in faces.items()}
         new_vertex_id = max(face_point_ids.values()) + 1
 
@@ -72,6 +68,7 @@ class CatmullClarkPlugin(TransformerPlugin):
                 adj_face_points = [] if len(adj) < 2 else [face_points[adj_face_id] for adj_face_id in adj]
                 # Calcola il nuovo punto medio del lato
                 edge_points[edge_id] = vertex_average([vertices[v] for v in endpoints] + adj_face_points)
+                # Assegna un nuovo vertex ID al punto
                 edge_point_ids[edge_id] = new_vertex_id
                 new_vertex_id += 1
 
@@ -84,7 +81,7 @@ class CatmullClarkPlugin(TransformerPlugin):
                         vertex_edges[endpoint].add(edge_id)
 
 
-        # Calcola i vertici spostati verso il baricentro
+        # Calcola i vertici originali spostati verso il baricentro
         moved_vertices = {}
 
         for vertex_id, original_vertex in vertices.items():
@@ -112,9 +109,9 @@ class CatmullClarkPlugin(TransformerPlugin):
 
         for face_id, face in faces.items():
             edge_ids = [edge_point_ids[tuple(sorted(endpoints))] for endpoints in [[face.v1, face.v2], [face.v2, face.v3], [face.v3, face.v1]]]
-            new_faces.extend(quad_to_triangles([face.v1, edge_ids[0], face_point_ids[face_id], edge_ids[2]]))
-            new_faces.extend(quad_to_triangles([face.v2, edge_ids[1], face_point_ids[face_id], edge_ids[0]]))
-            new_faces.extend(quad_to_triangles([face.v3, edge_ids[2], face_point_ids[face_id], edge_ids[1]]))
+            new_faces.extend(Face.quad_to_triangles([face.v1, edge_ids[0], face_point_ids[face_id], edge_ids[2]]))
+            new_faces.extend(Face.quad_to_triangles([face.v2, edge_ids[1], face_point_ids[face_id], edge_ids[0]]))
+            new_faces.extend(Face.quad_to_triangles([face.v3, edge_ids[2], face_point_ids[face_id], edge_ids[1]]))
 
         return Mesh(new_vertices, dict(enumerate(new_faces)))
 

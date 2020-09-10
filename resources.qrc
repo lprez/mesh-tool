@@ -1,9 +1,9 @@
 <RCC>
     <qresource prefix="/python">
-        <file>api.py</file>
+        <file>src/api.py</file>
     </qresource>
     <qresource prefix="/glsl">
-        <file>vertex.glsl</file>
-        <file>fragment.glsl</file>
+        <file>src/fragment.glsl</file>
+        <file>src/vertex.glsl</file>
     </qresource>
 </RCC>

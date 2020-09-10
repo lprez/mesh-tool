@@ -49,13 +49,13 @@ void MeshView::initializeGL()
     f->glClearColor(0.2, 0.2, 0.2, 1);
     f->glEnable(GL_DEPTH_TEST);
 
-    QFile vsfile(":/glsl/vertex.glsl");
+    QFile vsfile(":/glsl/src/vertex.glsl");
     vsfile.open(QFile::ReadOnly);
     QTextStream vsstream(&vsfile);
     QString vsstring = vsstream.readAll();
     vsfile.close();
 
-    QFile fsfile(":/glsl/fragment.glsl");
+    QFile fsfile(":/glsl/src/fragment.glsl");
     fsfile.open(QFile::ReadOnly);
     QTextStream fsstream(&fsfile);
     QString fsstring = fsstream.readAll();

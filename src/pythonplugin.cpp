@@ -9,7 +9,7 @@
 
 PythonPluginContext::PythonPluginContext()
 {
-    QFile apifile(":/python/api.py");
+    QFile apifile(":/python/src/api.py");
 
     if (!apifile.open(QFile::ReadOnly)) {
         throw std::runtime_error("Impossibile aprire il file api.py");
