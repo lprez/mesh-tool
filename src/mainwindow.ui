@@ -51,7 +51,7 @@
   <customwidget>
    <class>MeshView</class>
    <extends>QOpenGLWidget</extends>
-   <header location="global">meshview.h</header>
+   <header location="global">src/meshview.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

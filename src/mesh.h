@@ -44,10 +44,13 @@ public:
 
 class Mesh {
 public:
-    Mesh() : vertices(std::map<VertexID, Vertex>()), faces(std::map<FaceID, Face>()) {}
-    Mesh(const std::map<VertexID, Vertex>& vertices, const std::map<FaceID, Face>& faces) : vertices(vertices), faces(faces) {
-        populate_buffers(false);
+    Mesh() : vertices(std::map<VertexID, Vertex>()), faces(std::map<FaceID, Face>()), smooth(false) {}
+    Mesh(const std::map<VertexID, Vertex>& vertices, const std::map<FaceID, Face>& faces, bool smooth = false) :
+        vertices(vertices), faces(faces), smooth(smooth) {
+        populate_buffers(smooth);
     }
+
+    bool is_smooth() const { return smooth; }
 
     const void *position_buffer() const;
     size_t position_buffer_size() const;
@@ -63,6 +66,7 @@ public:
 private:
     std::map<VertexID, Vertex> vertices;
     std::map<FaceID, Face> faces;
+    bool smooth;
     //std::multimap<VertexID, FaceID> connected_faces;
 
     std::vector<float> positions;

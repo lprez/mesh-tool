@@ -202,5 +202,4 @@ void PythonExporter::export_to(const Mesh &mesh, const char *fname)
     PyObject *pyresult = PyObject_CallObject(pluginobject, args);
 
     Py_DECREF(args);
-    Py_DECREF(pyresult);
 }

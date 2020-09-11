@@ -1,5 +1,5 @@
 #include "mainwindow.h"
-#include "ui_mainwindow.h"
+#include "src/ui_mainwindow.h"
 
 #include <string>
 #include <QFileDialog>
@@ -73,12 +73,12 @@ MainWindow::MainWindow(const std::vector<PythonPlugin*>& plugins, QWidget *paren
                 const char *fname = QFileDialog::getOpenFileName(this).toLocal8Bit().data();
                 std::function<Mesh(const Mesh&)> importer = [=](const Mesh&) mutable {
                     return plugin_importer->import_from(fname);};
-                model->transform(importer);
+                if (strlen(fname) > 0) model->transform(importer);
             });
         } else if (PythonExporter* plugin_exporter = dynamic_cast<PythonExporter*>(plugin)) {
             connect(action, &QAction::triggered, this, [=]() {
                 const char *fname = QFileDialog::getSaveFileName(this).toLocal8Bit().data();
-                plugin_exporter->export_to(model->getMesh(), fname);
+                if (strlen(fname) > 0) plugin_exporter->export_to(model->getMesh(), fname);
             });
         }
 

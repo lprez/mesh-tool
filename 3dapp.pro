@@ -51,9 +51,13 @@ RESOURCES += \
 
 DISTFILES += \
     plugins/catmullclark.py \
+    plugins/exportobj.py \
+    plugins/importobj.py \
     src/api.py \
     src/fragment.glsl \
     src/vertex.glsl
+
+UI_DIR = src
 
 # Copia i plugin dalla cartella sorgente a quella di build.
 copyplugins.commands = $(COPY_DIR) $$PWD/plugins/* $$OUT_PWD/plugins/

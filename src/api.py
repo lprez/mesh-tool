@@ -43,9 +43,10 @@ class Face:
                  Face(vertices[0], vertices[2], vertices[3]) ]
 
 class Mesh:
-    def __init__(self, vertices={}, faces={}):
+    def __init__(self, vertices={}, faces={}, smooth=False):
         self.vertices = vertices
         self.faces = faces
+        self.smooth = smooth
 
     def __repr__(self):
         return "Mesh({}, {})".format(self.vertices, self.faces)

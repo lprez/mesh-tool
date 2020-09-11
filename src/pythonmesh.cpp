@@ -39,9 +39,12 @@ Mesh pyobject_to_mesh(PyObject *pymesh)
     std::map<FaceID, Face> faces;
 
     PyObject *pyvertex_map = PyObject_GetAttrString(pymesh, "vertices"),
-             *pyface_map = PyObject_GetAttrString(pymesh, "faces");
+             *pyface_map = PyObject_GetAttrString(pymesh, "faces"),
+             *pysmooth = PyObject_GetAttrString(pymesh, "faces");
 
-    if (!pyvertex_map || !pyface_map) {
+    bool smooth = PyObject_IsTrue(pysmooth) == 1;
+
+    if (!pyvertex_map || !pyface_map || !pysmooth) {
         throw std::runtime_error("Oggetto Mesh malformato (manca vertices o faces)");
     }
 
@@ -109,8 +112,9 @@ Mesh pyobject_to_mesh(PyObject *pymesh)
     Py_DECREF(pyfaces);
     Py_DECREF(pyvertex_map);
     Py_DECREF(pyface_map);
+    Py_DECREF(pysmooth);
 
-    return Mesh(vertices, faces);
+    return Mesh(vertices, faces, smooth);
 }
 
 
@@ -157,6 +161,9 @@ PyObject *mesh_to_pyobject(const Mesh &mesh)
         PyObject_SetItem(pyfaces, PyLong_FromUnsignedLong(it->first), pyface);
         Py_DECREF(pyface);
     }
+
+    PyObject *pysmooth = PyBool_FromLong(mesh.is_smooth() ? 1 : 0);
+    PyObject_SetAttrString(pymesh, "smooth", pysmooth);
 
     Py_DECREF(apimodule);
     Py_DECREF(pyvertices);
