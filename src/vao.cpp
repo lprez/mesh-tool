@@ -36,6 +36,7 @@ void VAO::draw(GLsizei count)
     QOpenGLFunctions_4_5_Core *f = QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_4_5_Core>();
 
     f->glBindVertexArray(vao_id);
+    //f->glPointSize(3);
     f->glDrawArrays(GL_TRIANGLES, 0, count);
     f->glBindVertexArray(0);
 }

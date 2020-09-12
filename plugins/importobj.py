@@ -15,25 +15,18 @@ class ImportOBJPlugin(ImporterPlugin):
 
         # L'espressione regolare che rappresenta tutte le righe del file OBJ
         # di interesse (posizione dei vertici, coordinate UV e facce)
-        self.command_regex = re.compile(r"(f|vt?|s)\s+(.*)")
+        self.command_regex = re.compile(r"(f|v[tn]?|s)\s+(.*)")
         # Parametri del comando f
         self.face_regex = re.compile(r"[1-9][0-9]*(\/[1-9]?[0-9]*)*")
 
     def __call__(self, fname):
-        positions = [(0.0, 0.0, 0.0)]
+        #positions = [(0.0, 0.0, 0.0)]
+        normals = [(0.0, 0.0, 0.0)]
         uvs = [(0.0, 0.0)]
         faces = []
         smooth = True
 
-        # Mappa da (id posizione, id uv) -> (id vertice)
-        # Necessaria perché nel formato OBJ gli indici sono assegnati
-        # separatamente a posizione e uv, mentre per OpenGL serve un unico
-        # indice per ongni vertice
-        mapped_vertices = {}
-        next_vertex_id = 0
-
-        # Mappe finali
-        vertices = {}
+        vertices = []
         faces = []
 
         with open(fname) as file:
@@ -44,7 +37,7 @@ class ImportOBJPlugin(ImporterPlugin):
                     args = match.group(2).split()
 
                     if command == "f":
-                        vertex_ids = []
+                        subvertices = []
 
                         for arg in args:
                             if self.face_regex.match(arg) is None:
@@ -53,33 +46,32 @@ class ImportOBJPlugin(ImporterPlugin):
                             indices = [0 if len(index) == 0 else int(index) for index in arg.split("/")]
                             position_index = indices[0]
                             uv_index = 0 if len(indices) < 2 else indices[1]
+                            normal_index = 0 if len(indices) < 3 else indices[2]
+                            vertex_id = position_index - 1
 
-                            # Bisogna assegnare un indice al vertice specificato nella faccia
-                            compound_index = (position_index, uv_index)
-                            if compound_index in mapped_vertices:
-                                vertex_ids.append(mapped_vertices[compound_index])
-                            else:
-                                mapped_vertices[compound_index] = next_vertex_id
-                                vertex_ids.append(next_vertex_id)
-                                vertices[next_vertex_id] = Vertex(positions[position_index], uvs[uv_index])
-                                next_vertex_id += 1
+                            if vertex_id >= len(vertices) or uv_index >= len(uvs) or normal_index >= len(normals):
+                                raise RuntimeError("Indici non validi")
 
-                        if len(vertex_ids) == 3:
-                            faces.append(Face(*vertex_ids))
-                        elif len(vertex_ids) == 4:
-                            faces.extend(Face.quad_to_triangles(vertex_ids))
+                            subvertices.append(SubVertex(vertex_id, normals[normal_index], uvs[uv_index]))
+
+                        if len(subvertices) == 3:
+                            faces.append(Face(*subvertices))
+                        elif len(subvertices) == 4:
+                            faces.extend(Face.quad_to_triangles(subvertices))
                         else:
                             raise RuntimeError("Sono supportati solo triangoli e quadrilateri")
                     elif command == "s":
                         if args[0] == "off":
                             smooth = False
-                    else:
+                    elif command.startswith("v"):
                         coords = [float(coord) for coord in args]
                         if command == "v":
-                            positions.append(tuple(resize_list(coords, 3)))
-                        else:
+                            vertices.append(Vertex(tuple(resize_list(coords, 3))))
+                        elif command == "vt":
                             uvs.append(tuple(resize_list(coords, 2)))
+                        else:
+                            normals.append(tuple(resize_list(coords, 3)))
 
-        return Mesh(vertices, dict(enumerate(faces)), smooth)
+        return Mesh(dict(enumerate(vertices)), dict(enumerate(faces)), smooth, False)
 
 plugin = ImportOBJPlugin("Importa OBJ", "File", "Importa OBJ")

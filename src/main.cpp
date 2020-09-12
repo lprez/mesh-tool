@@ -16,7 +16,8 @@ int main(int argc, char *argv[])
     QFileInfoList plugin_sources = plugin_directory.entryInfoList(QStringList() << "*.py", QDir::Files);
 
     for (QFileInfo plugin_info : plugin_sources) {
-        plugins.push_back(PythonPlugin::load(plugin_info.canonicalFilePath().toLocal8Bit().data()));
+        PythonPlugin *plugin = PythonPlugin::load(plugin_info.canonicalFilePath().toLocal8Bit().data());
+        if (plugin != nullptr) plugins.push_back(plugin);
     }
 
     QObject::connect(&a, &QCoreApplication::aboutToQuit, &a, [plugins]() {

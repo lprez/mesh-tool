@@ -42,6 +42,11 @@ QMAKE_CXXFLAGS += $$system(python3-config --cflags)
 QMAKE_LFLAGS += $$system(python3-config --ldflags --embed)
 INCLUDEPATH += $$system(python3-config --includes)
 
+#debug {
+#    QMAKE_CXXFLAGS -= -O3
+#    QMAKE_CXXFLAGS += -O0
+#}
+
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
@@ -53,6 +58,8 @@ DISTFILES += \
     plugins/catmullclark.py \
     plugins/exportobj.py \
     plugins/importobj.py \
+    plugins/loopsubdivision.py \
+    plugins/subdivision_utils.py \
     src/api.py \
     src/fragment.glsl \
     src/vertex.glsl

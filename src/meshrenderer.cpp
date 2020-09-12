@@ -12,9 +12,12 @@ MeshRenderer::MeshRenderer(const Mesh &mesh, ShaderProgram &program)
 
 void MeshRenderer::update(const Mesh &mesh)
 {
-    position_buffer.reset(mesh.position_buffer(), mesh.position_buffer_size());
-    normal_buffer.reset(mesh.normal_buffer(), mesh.normal_buffer_size());
-    uv_buffer.reset(mesh.uv_buffer(), mesh.uv_buffer_size());
+    std::vector<float> positions = mesh.position_vector(),
+                       normals = mesh.normal_vector(),
+                       uvs = mesh.uv_vector();
+    position_buffer.reset(positions.data(), positions.size() * sizeof(positions[0]));
+    normal_buffer.reset(normals.data(), normals.size() * sizeof(normals[0]));
+    uv_buffer.reset(uvs.data(), uvs.size() * sizeof(uvs[0]));
     triangle_count = mesh.face_map().size() * 3;
     vao.set_attributes(0, {&position_buffer, &normal_buffer, &uv_buffer});
 }

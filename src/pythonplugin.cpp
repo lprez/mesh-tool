@@ -29,6 +29,15 @@ PythonPluginContext::PythonPluginContext()
         throw std::runtime_error("Impossibile compilare il file api.py");
     }
 
+    PyObject *modules = PyImport_GetModuleDict(),
+             *sysmodule = PyMapping_GetItemString(modules, "sys"),
+             *syspath = PyObject_GetAttrString(sysmodule, "path"),
+             *newpath = PyUnicode_FromString("plugins");
+
+    PyList_Insert(syspath, 1, newpath);
+
+    Py_DECREF(syspath);
+    Py_DECREF(newpath);
     Py_DECREF(apicode);
 }
 
@@ -55,15 +64,15 @@ PythonPlugin *PythonPlugin::load(const char *fname)
 
 
     PyObject *plugincode = Py_CompileString(src.toLocal8Bit().constData(), fname, Py_file_input);
-    PyObject *pluginmodule = PyImport_ExecCodeModule("plugin", plugincode);
+    PyObject *pluginmodule = PyImport_ExecCodeModule(fname, plugincode);
     PyObject *pluginobject;
 
     if (pluginmodule) {
         pluginobject = PyObject_GetAttrString(pluginmodule, "plugin");
 
         if (!pluginobject) {
-            PyErr_Print();
-            throw std::runtime_error("Nessun oggetto plugin");
+            Py_DECREF(plugincode);
+            return nullptr;
         }
     } else {
         PyErr_Print();

@@ -6,6 +6,7 @@
 #include "vao.h"
 #include "shader.h"
 
+// Contiene lo stato necessario al rendering di una Mesh
 class MeshRenderer
 {
 public:

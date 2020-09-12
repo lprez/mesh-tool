@@ -12,9 +12,9 @@ MainWindow::MainWindow(const std::vector<PythonPlugin*>& plugins, QWidget *paren
 
 
     std::map<VertexID, Vertex> vertices = {
-        {0, Vertex({-1, -1, 0}, {0, 0})},
-        {1, Vertex({1, -1, 0}, {0, 0})},
-        {2, Vertex({0, 1, 0}, {0, 0})}
+        {0, Vertex({-1, -1, 0})},
+        {1, Vertex({1, -1, 0})},
+        {2, Vertex({0, 1, 0})}
     };
     std::map<FaceID, Face> faces = {
         {0, Face(0, 1, 2)}
@@ -70,18 +70,19 @@ MainWindow::MainWindow(const std::vector<PythonPlugin*>& plugins, QWidget *paren
                 model->transform(transformer); });
         } else if (PythonImporter* plugin_importer = dynamic_cast<PythonImporter*>(plugin)) {
             connect(action, &QAction::triggered, this, [=]() {
-                const char *fname = QFileDialog::getOpenFileName(this).toLocal8Bit().data();
+                QString fname = QFileDialog::getOpenFileName(this);
                 std::function<Mesh(const Mesh&)> importer = [=](const Mesh&) mutable {
-                    return plugin_importer->import_from(fname);};
-                if (strlen(fname) > 0) model->transform(importer);
+                    return plugin_importer->import_from(fname.toLocal8Bit().data());};
+                if (fname.count() > 0) model->transform(importer);
             });
         } else if (PythonExporter* plugin_exporter = dynamic_cast<PythonExporter*>(plugin)) {
             connect(action, &QAction::triggered, this, [=]() {
-                const char *fname = QFileDialog::getSaveFileName(this).toLocal8Bit().data();
-                if (strlen(fname) > 0) plugin_exporter->export_to(model->getMesh(), fname);
+                QString fname = QFileDialog::getSaveFileName(this);
+                if (fname.count() > 0) plugin_exporter->export_to(model->getMesh(), fname.toLocal8Bit().data());
             });
+        } else {
+            continue;
         }
-
 
         menu->addAction(action);
     }

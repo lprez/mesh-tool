@@ -8,7 +8,6 @@
 #ifndef MESH_H_
 #define MESH_H_
 
-// TODO: spostare in un altro modulo
 #include <cstdint>
 #include <map>
 #include <vector>
@@ -21,45 +20,61 @@ using Mat4 = Matrix<float, 4, 4>;
 using VertexID = uint32_t;
 using FaceID = uint32_t;
 
+// Rappresenta un vertice (in senso geometrico)
 class Vertex {
 public:
-    //Vertex(Vec3 position, Vec3 uv, Vec3 normal, unsigned int id) :
-    //    position(position), uv(uv), normal(normal), id(id) {}
-    Vertex(Vec3 position, Vec2 uv) : position(position), uv(uv) {}
+    Vertex(Vec3 position) : position(position) {}
 
-    Vec3 position; //, normal;
+    Vec3 position;
+};
+
+// Rappresenta una particolare istanza di un vertice con gli attributi
+// necessari al rendering. Possono esserci più SubVertex per lo stesso
+// veritce (per esempio, lo stesso vertice di un cubo
+// può far riferimento a parti diverse della texture in base alla faccia
+// che si sta renderizzando, per cui servono coordinate UV diverse, ma duplicare
+// il vertice non va bene perché algoritmi come Catmull-Clark richiedono la
+// conoscenza della topologia della mesh).
+class SubVertex {
+public:
+    SubVertex(VertexID v) : vertex_id(v) {}
+    SubVertex(VertexID v, Vec3 normal, Vec2 uv) : vertex_id(v), uv(uv), normal(normal) {}
+    VertexID vertex_id;
     Vec2 uv;
-    //unsigned int id;
+    Vec3 normal;
 };
 
 class Face {
 public:
-    Face(VertexID v1, VertexID v2, VertexID v3) : v1(v1), v2(v2), v3(v3) {}
+    Face(VertexID v1, VertexID v2, VertexID v3) : sv1(v1), sv2(v2), sv3(v3) {}
+    Face(SubVertex sv1, SubVertex sv2, SubVertex sv3) : sv1(sv1), sv2(sv2), sv3(sv3) {}
 
-    // Calcola la normale alla superficie.
-    static Vec3 normal(const Vertex& v1, const Vertex& v2, const Vertex& v3);
+    // Imposta la stessa normale per tutti i SubVertex
+    void set_normal(Vec3 normal);
+    // Imposta una normale diversa per ogni SubVertex
+    void set_normals(Vec3, Vec3, Vec3);
+    // Calcola la normale alla superficie
+    static Vec3 surface_normal(const Vertex &v1, const Vertex &v2, const Vertex &v3);
 
-    VertexID v1, v2, v3;
+    SubVertex sv1, sv2, sv3;
 };
 
 class Mesh {
 public:
     Mesh() : vertices(std::map<VertexID, Vertex>()), faces(std::map<FaceID, Face>()), smooth(false) {}
-    Mesh(const std::map<VertexID, Vertex>& vertices, const std::map<FaceID, Face>& faces, bool smooth = false) :
-        vertices(vertices), faces(faces), smooth(smooth) {
-        populate_buffers(smooth);
-    }
+    Mesh(const std::map<VertexID, Vertex>& vertices, const std::map<FaceID, Face>& faces, bool smooth = false, bool recalculate_normals = true);
 
+    // Ricalcola le normali dei SubVertex
+    void recalculate_normals();
+
+    // Cambia il tipo di shading (smooth/flat)
+    void set_smooth(bool smooth, bool recalculate_normals = true);
     bool is_smooth() const { return smooth; }
 
-    const void *position_buffer() const;
-    size_t position_buffer_size() const;
-    const void *normal_buffer() const;
-    size_t normal_buffer_size() const;
-    const void *uv_buffer() const;
-    size_t uv_buffer_size() const;
-    //const void *element_buffer() const;
-    //size_t element_buffer_size() const;
+    // Genera un vettore con tutte le posizioni usate da tutte le facce
+    std::vector<float> position_vector() const;
+    std::vector<float> normal_vector() const;
+    std::vector<float> uv_vector() const;
 
     const std::map<VertexID, Vertex> vertex_map() const { return vertices; }
     const std::map<FaceID, Face> face_map() const { return faces; }
@@ -69,43 +84,11 @@ private:
     bool smooth;
     //std::multimap<VertexID, FaceID> connected_faces;
 
-    std::vector<float> positions;
-    std::vector<float> normals;
-    std::vector<float> uvs;
+    //std::vector<float> positions;
+    //std::vector<float> normals;
+    //std::vector<float> uvs;
 
     void populate_buffers(bool smooth);
 };
-
-
-inline const void *Mesh::position_buffer() const
-{
-    return positions.data();
-}
-
-inline size_t Mesh::position_buffer_size() const
-{
-    return positions.size() * sizeof(positions[0]);
-}
-
-inline const void *Mesh::normal_buffer() const
-{
-    return normals.data();
-}
-
-inline size_t Mesh::normal_buffer_size() const
-{
-    return normals.size() * sizeof(normals[0]);
-}
-
-inline const void *Mesh::uv_buffer() const
-{
-    return uvs.data();
-}
-
-inline size_t Mesh::uv_buffer_size() const
-{
-    return uvs.size() * sizeof(uvs[0]);
-}
-
 
 #endif /* MESH_H_ */

@@ -26,6 +26,8 @@ private:
 class PythonPlugin
 {
 public:
+    // Carica un file .py. Se ritorna null, vuol dire che il codice non contiene un plugin
+    // (es. modulo di utilità importato da altri plugin).
     static PythonPlugin *load(const char *fname);
     virtual ~PythonPlugin();
     std::wstring name();
