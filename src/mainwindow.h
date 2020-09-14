@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include "pythonplugin.h"
+#include "meshmodel.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -13,12 +14,17 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(const std::vector<PythonPlugin*>& plugins, QWidget *parent = nullptr);
+    MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-
-private Q_SLOTS:
+    
+public Q_SLOTS:
+    void on_recalculate_normals();
 
 private:
+    void load_plugins();
+    void plugin_error_dialog(PythonPluginException& exception);
     Ui::MainWindow *ui;
+    MeshModel *mesh_model;
+    std::vector<PythonPlugin*> plugins;
 };
 #endif // MAINWINDOW_H

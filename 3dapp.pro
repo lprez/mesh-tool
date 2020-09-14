@@ -15,6 +15,7 @@ SOURCES += \
     src/meshmodel.cpp \
     src/meshrenderer.cpp \
     src/meshview.cpp \
+    src/pythonexception.cpp \
     src/pythonmesh.cpp \
     src/pythonplugin.cpp \
     src/shader.cpp \
@@ -28,6 +29,7 @@ HEADERS += \
     src/meshmodel.h \
     src/meshrenderer.h \
     src/meshview.h \
+    src/pythonexception.h \
     src/pythonmesh.h \
     src/pythonplugin.h \
     src/shader.h \

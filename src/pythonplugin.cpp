@@ -1,18 +1,29 @@
+
 #include <Python.h>
 #include <QFile>
 #include <QTextStream>
 #include <QString>
 
 #include "pythonplugin.h"
+#include "pythonexception.h"
 #include "pythonmesh.h"
 
+std::wstring pyunicode_to_wstring(PyObject *pystr)
+{
+    wchar_t *tmp_str = PyUnicode_AsWideCharString(pystr, NULL);
+    std::wstring prop(tmp_str);
+    PyMem_Free(tmp_str);
+    return prop;
+}
 
 PythonPluginContext::PythonPluginContext()
 {
+    // Inizializza l'interprete Python e carica il modulo API
+
     QFile apifile(":/python/src/api.py");
 
     if (!apifile.open(QFile::ReadOnly)) {
-        throw std::runtime_error("Impossibile aprire il file api.py");
+        throw PythonPluginException(L"(API)", L"Impossibile aprire il file api.py");
     }
 
     QTextStream stream(&apifile);
@@ -25,10 +36,10 @@ PythonPluginContext::PythonPluginContext()
     PyObject *apicode = Py_CompileString(src.toLocal8Bit().constData(), "api.py", Py_file_input);
 
     if (!PyImport_ExecCodeModule("api", apicode)) {
-        PyErr_Print();
-        throw std::runtime_error("Impossibile compilare il file api.py");
+        throw PythonPluginException(L"(API)", L"Impossibile compilare il file api.py", PyEval_SaveThread());
     }
 
+    // Aggiunge la directory plugins al sys.path
     PyObject *modules = PyImport_GetModuleDict(),
              *sysmodule = PyMapping_GetItemString(modules, "sys"),
              *syspath = PyObject_GetAttrString(sysmodule, "path"),
@@ -50,12 +61,11 @@ PythonPlugin *PythonPlugin::load(const char *fname)
 {
     PythonPluginContext::getContext(); // Inizializza l'interprete Python e il modulo
                                        // API se non è stato già fatto.
-
-
+    std::wstring wfname(fname, fname + strlen(fname));
     QFile pluginfile(fname);
 
     if (!pluginfile.open(QFile::ReadOnly)) {
-        throw std::runtime_error(std::string("Impossibile aprire il file ").append(std::string(fname)));
+        throw PythonPluginException(wfname, std::wstring(L"Impossibile aprire il file ").append(wfname));
     }
     QTextStream stream(&pluginfile);
     QString src = stream.readAll();
@@ -71,12 +81,12 @@ PythonPlugin *PythonPlugin::load(const char *fname)
         pluginobject = PyObject_GetAttrString(pluginmodule, "plugin");
 
         if (!pluginobject) {
+            PyErr_Clear();
             Py_DECREF(plugincode);
             return nullptr;
         }
     } else {
-        PyErr_Print();
-        throw std::runtime_error("Impossibile compilare il plugin");
+        throw PythonPluginException(wfname, L"Impossibile compilare il plugin", PyEval_SaveThread());
     }
 
     Py_DECREF(plugincode);
@@ -88,7 +98,7 @@ PythonPlugin *PythonPlugin::load(const char *fname)
              *importer_class = PyObject_GetAttrString(apimodule, "ImporterPlugin");
 
     if (!transformer_class || !exporter_class || !importer_class) {
-        throw std::runtime_error("Modulo API non valido, mancano le classi Plugin");
+        throw PythonPluginException(wfname, L"Modulo API non valido, mancano le classi Plugin", PyEval_SaveThread());
     }
 
     PythonPlugin *plugin;
@@ -100,7 +110,7 @@ PythonPlugin *PythonPlugin::load(const char *fname)
     } else if (PyObject_IsInstance(pluginobject, exporter_class)) {
         plugin = new PythonExporter(pluginobject);
     } else {
-        throw std::runtime_error("plugin non è un'istanza di una classe valida");
+        throw PythonPluginException(wfname, L"plugin non è un'istanza di una classe valida", PyEval_SaveThread());
     }
 
     return plugin;
@@ -140,10 +150,7 @@ std::wstring PythonPlugin::entry()
 
 std::wstring PythonPlugin::string_property(const char *property)
 {
-    wchar_t *tmp_property = PyUnicode_AsWideCharString(PyObject_GetAttrString(pluginobject, property), NULL);
-    std::wstring prop(tmp_property);
-    PyMem_Free(tmp_property);
-    return prop;
+    return pyunicode_to_wstring(PyObject_GetAttrString(pluginobject, property));
 }
 
 void PythonPlugin::cleanup()
@@ -159,18 +166,26 @@ Mesh PythonTransformer::transform(const Mesh &mesh)
     Mesh result;
     PyObject *args = PyTuple_New(1);
 
-    PyTuple_SetItem(args, 0, mesh_to_pyobject(mesh));
-
-    PyObject *pymesh = PyObject_CallObject(pluginobject, args);
-
-    if (!pymesh) {
-        PyErr_Print();
-        throw std::runtime_error("Si è verificato un errore nell'esecuzione del plugin");
+    try {
+        PyTuple_SetItem(args, 0, mesh_to_pyobject(mesh));
+    } catch (PythonException& e) {
+        throw PythonPluginException(e, name());
     }
 
-    result = pyobject_to_mesh(pymesh);
-
+    PyObject *pymesh = PyObject_CallObject(pluginobject, args);
     Py_DECREF(args);
+
+    if (!pymesh) {
+        throw PythonPluginException(name(), L"Si è verificato un errore nell'esecuzione del plugin", PyEval_SaveThread());
+    }
+
+    try {
+        result = pyobject_to_mesh(pymesh);
+    } catch (PythonException& e) {
+        Py_DECREF(pymesh);
+        throw PythonPluginException(e, name());
+    }
+
     Py_DECREF(pymesh);
 
     return result;
@@ -185,15 +200,19 @@ Mesh PythonImporter::import_from(const char *fname)
 
     PyObject *pymesh = PyObject_CallObject(pluginobject, args);
 
+    Py_DECREF(args);
+
     if (!pymesh) {
-        PyErr_Print();
-        throw std::runtime_error("Si è verificato un errore nell'esecuzione del plugin");
+        throw PythonPluginException(name(), L"Si è verificato un errore nell'esecuzione del plugin", PyEval_SaveThread());
     }
 
+    try {
+        result = pyobject_to_mesh(pymesh);
+    } catch (PythonException& e) {
+        Py_DECREF(pymesh);
+        throw PythonPluginException(e, name());
+    }
 
-    result = pyobject_to_mesh(pymesh);
-
-    Py_DECREF(args);
     Py_DECREF(pymesh);
 
     return result;
@@ -205,10 +224,22 @@ void PythonExporter::export_to(const Mesh &mesh, const char *fname)
     Mesh result;
     PyObject *args = PyTuple_New(2);
 
-    PyTuple_SetItem(args, 0, mesh_to_pyobject(mesh));
+    PyErr_Clear();
+
+    try {
+        PyTuple_SetItem(args, 0, mesh_to_pyobject(mesh));
+    } catch (PythonException& e) {
+        Py_DECREF(args);
+        throw PythonPluginException(e, name());
+    }
+
     PyTuple_SetItem(args, 1, PyUnicode_FromString(fname));
 
-    PyObject *pyresult = PyObject_CallObject(pluginobject, args);
+    PyObject_CallObject(pluginobject, args);
 
     Py_DECREF(args);
+
+    if (PyErr_Occurred() != nullptr) {
+        throw PythonPluginException(name(), L"Si è verificato un errore nell'esecuzione del plugin", PyEval_SaveThread());
+    }
 }

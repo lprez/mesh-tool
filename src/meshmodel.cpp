@@ -1,7 +1,7 @@
 #include "meshmodel.h"
 
-void MeshModel::transform(std::function<Mesh (const Mesh&)>& transformer)
+void MeshModel::replace(const Mesh& new_mesh)
 {
-    this->mesh = transformer(this->mesh);
+    this->mesh = new_mesh;
     Q_EMIT meshChanged();
 }

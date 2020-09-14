@@ -1,7 +1,7 @@
 #include "pythonmesh.h"
+#include "pythonexception.h"
 
 #include <map>
-#include <stdexcept>
 
 template <unsigned int N> Vector<float, N> pytuple_to_vector(PyObject *pytuple)
 {
@@ -11,7 +11,7 @@ template <unsigned int N> Vector<float, N> pytuple_to_vector(PyObject *pytuple)
         PyObject *pycomponent = PyTuple_GetItem(pytuple, i);
 
         if (!pycomponent) {
-            throw std::runtime_error("Vettore non valido");
+            throw PythonException(L"Vettore non valido", PyEval_SaveThread());
         }
 
         values[i] = PyFloat_AsDouble(pycomponent);
@@ -38,7 +38,7 @@ Vertex pyobject_to_vertex(PyObject *pyvertex)
     PyObject *pyposition = PyObject_GetAttrString(pyvertex, "position");
 
     if (!pyposition) {
-        throw std::runtime_error("Oggetto Vertex malformato (position mancante)");
+        throw PythonException(L"Oggetto Vertex malformato (position mancante)", PyEval_SaveThread());
     }
 
     Vertex vertex(pytuple_to_vector<3>(pyposition));
@@ -65,7 +65,7 @@ SubVertex pyobject_to_subvertex(PyObject *pysubvertex)
              *pyuv = PyObject_GetAttrString(pysubvertex, "uv");
 
     if (!pyvertexid || !pynormal || !pyuv) {
-        throw std::runtime_error("Oggetto SubVertex malformato");
+        throw PythonException(L"Oggetto SubVertex malformato", PyEval_SaveThread());
     }
 
     SubVertex subvertex(
@@ -106,21 +106,21 @@ Mesh pyobject_to_mesh(PyObject *pymesh)
          recalculate_normals = PyObject_IsTrue(pydirtynormals) == 1;
 
     if (!pyvertex_map || !pyface_map || !pysmooth) {
-        throw std::runtime_error("Oggetto Mesh malformato (manca vertices o faces)");
+        throw PythonException(L"Oggetto Mesh malformato (manca vertices o faces)", PyEval_SaveThread());
     }
 
     PyObject *pyvertices = PyMapping_Items(pyvertex_map),
              *pyfaces = PyMapping_Items(pyface_map);
 
     if (!pyvertices || !pyfaces) {
-        throw std::runtime_error("Oggetto Mesh malformato (vertices o faces non è un dictionary)");
+        throw PythonException(L"Oggetto Mesh malformato (vertices o faces non è un dictionary)", PyEval_SaveThread());
     }
 
     for (Py_ssize_t i = 0; i < PySequence_Size(pyvertices); i++) {
         PyObject *tuple = PySequence_GetItem(pyvertices, i);
 
         if (!tuple) {
-            throw std::runtime_error("Oggetto Mesh malformato (vertices non è un dictionary)");
+            throw PythonException(L"Oggetto Mesh malformato (vertices non è un dictionary)", PyEval_SaveThread());
         }
 
         PyObject *pyvertexid = PyTuple_GetItem(tuple, 0),
@@ -136,7 +136,7 @@ Mesh pyobject_to_mesh(PyObject *pymesh)
         PyObject *tuple = PySequence_GetItem(pyfaces, i);
 
         if (!tuple) {
-            throw std::runtime_error("Oggetto Mesh malformato (faces non è un dictionary)");
+            throw PythonException(L"Oggetto Mesh malformato (faces non è un dictionary)", PyEval_SaveThread());
         }
 
         PyObject *pyfaceid = PyTuple_GetItem(tuple, 0),
@@ -146,7 +146,7 @@ Mesh pyobject_to_mesh(PyObject *pymesh)
                  *pysv3 = PyObject_GetAttrString(pyface, "sv3");
 
         if (!pysv1 || !pysv2 || !pysv3) {
-            throw std::runtime_error("Oggetto Face malformato (sv1, sv2 o sv3 mancante)");
+            throw PythonException(L"Oggetto Face malformato (sv1, sv2 o sv3 mancante)", PyEval_SaveThread());
         }
 
         faces.insert(std::make_pair((FaceID) PyNumber_AsSsize_t(pyfaceid, nullptr),
@@ -180,7 +180,7 @@ PyObject *mesh_to_pyobject(const Mesh &mesh)
              *pymesh = PyObject_CallMethod(apimodule, "Mesh", "{}{}OO", pysmooth, pydirtynormals);
 
     if (!pymesh) {
-        throw std::runtime_error("Impossibile creare un oggetto Mesh");
+        throw PythonException(L"Impossibile creare un oggetto Mesh", PyEval_SaveThread());
     }
 
 

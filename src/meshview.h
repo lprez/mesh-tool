@@ -8,7 +8,6 @@
 #include "meshrenderer.h"
 
 // Un Widget che rappresenta lo spazio 3D in cui viene visualizzata la mesh.
-
 class MeshView : public QOpenGLWidget
 {
 public:

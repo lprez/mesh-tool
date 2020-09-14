@@ -37,15 +37,34 @@
      <string>File</string>
     </property>
    </widget>
-   <widget class="QMenu" name="menuModifica">
+   <widget class="QMenu" name="menuEdit">
     <property name="title">
      <string>Modifica</string>
     </property>
+    <addaction name="action_recalculate_normals"/>
+    <addaction name="separator"/>
    </widget>
    <addaction name="menuFile"/>
-   <addaction name="menuModifica"/>
+   <addaction name="menuEdit"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <action name="action_recalculate_normals">
+   <property name="text">
+    <string>Ricalcola normali</string>
+   </property>
+  </action>
+  <action name="action_plugins">
+   <property name="text">
+    <string>Plugins</string>
+   </property>
+   <property name="font">
+    <font>
+     <weight>75</weight>
+     <italic>true</italic>
+     <bold>true</bold>
+    </font>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -55,5 +74,25 @@
   </customwidget>
  </customwidgets>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>action_recalculate_normals</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>on_recalculate_normals()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>on_recalculate_normals()</slot>
+ </slots>
 </ui>

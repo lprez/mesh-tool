@@ -30,7 +30,7 @@ public:
 
 // Rappresenta una particolare istanza di un vertice con gli attributi
 // necessari al rendering. Possono esserci più SubVertex per lo stesso
-// veritce (per esempio, lo stesso vertice di un cubo
+// vertice (per esempio, lo stesso vertice di un cubo
 // può far riferimento a parti diverse della texture in base alla faccia
 // che si sta renderizzando, per cui servono coordinate UV diverse, ma duplicare
 // il vertice non va bene perché algoritmi come Catmull-Clark richiedono la
@@ -82,11 +82,6 @@ private:
     std::map<VertexID, Vertex> vertices;
     std::map<FaceID, Face> faces;
     bool smooth;
-    //std::multimap<VertexID, FaceID> connected_faces;
-
-    //std::vector<float> positions;
-    //std::vector<float> normals;
-    //std::vector<float> uvs;
 
     void populate_buffers(bool smooth);
 };
