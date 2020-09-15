@@ -26,10 +26,10 @@ MainWindow::MainWindow(QWidget *parent)
 /*
 
     std::map<VertexID, Vertex> vertices = {
-        {0, Vertex({-1, -1, 0}, {0, 0})},
-        {1, Vertex({1, -1, 0}, {0, 0})},
-        {2, Vertex({1, 1, 0}, {0, 0})},
-        {3, Vertex({-1, 1, 0}, {0, 0})}
+        {0, Vertex({-1, -1, 0.5}, {0, 0})},
+        {1, Vertex({1, -1, 0.5}, {0, 0})},
+        {2, Vertex({1, 1, 0.5}, {0, 0})},
+        {3, Vertex({-1, 1, 0.5}, {0, 0})}
     };
     std::map<FaceID, Face> faces = {
         {0, Face(0, 1, 2)},

@@ -86,3 +86,25 @@ void ShaderProgram::use() const
         current_program_id = program_id;
     }
 }
+
+BasicShaderProgram::BasicShaderProgram(const char *vertex_shader,
+                                       const char *fragment_shader,
+                                       const char *model_matrix_uniform,
+                                       const char *view_matrix_uniform,
+                                       const char *proj_matrix_uniform)
+    : ShaderProgram(vertex_shader, fragment_shader)
+{
+    QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
+
+    model_matrix_uniform_id = f->glGetUniformLocation(get_program_id(), model_matrix_uniform);
+    view_matrix_uniform_id = f->glGetUniformLocation(get_program_id(), view_matrix_uniform);
+    proj_matrix_uniform_id = f->glGetUniformLocation(get_program_id(), proj_matrix_uniform);
+}
+
+void BasicShaderProgram::set_4x4_matrix(GLint uniform_id, const Matrix<GLfloat, 4, 4>& matrix)
+{
+    QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
+
+    use();
+    f->glUniformMatrix4fv(uniform_id, 1, true, matrix.data_ptr());
+}

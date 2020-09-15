@@ -241,16 +241,38 @@ template <typename T> Matrix<T, 4, 4> look_at4(
 {
 	Vector<T, 3> zv = (eye - target).normalized();
 	Vector<T, 3> xv = cross3(up, zv).normalized();
-	Vector<T, 3> yv = cross3(zv, xv);
+    Vector<T, 3> yv = cross3(zv, xv);
 
 	Matrix<T, 4, 4> result = {
-			xv[0], xv[1], xv[2], (- xv.transpose() * eye)[0],
-			yv[0], yv[1], yv[2], (- yv.transpose() * eye)[0],
-			zv[0], zv[1], zv[2], (- zv.transpose() * eye)[0],
+            xv[0], xv[1], xv[2], (-(xv.transpose() * eye))[0],
+            yv[0], yv[1], yv[2], (-(yv.transpose() * eye))[0],
+            zv[0], zv[1], zv[2], (-(zv.transpose() * eye))[0],
 			0, 0, 0, 1
 	};
 
 	return result;
+}
+
+// Una variante più semplice
+template <typename T> Matrix<T, 4, 4> camera4(const Vector<T, 3>& eye, float pitch, float yaw)
+{
+    float cosPitch = cos(pitch),
+          sinPitch = sin(pitch),
+          cosYaw = cos(yaw),
+          sinYaw = sin(yaw);
+
+    Vector<T, 3> xv({cosYaw, 0, -sinYaw}),
+                 yv({sinYaw * sinPitch, cosPitch, cosYaw * sinPitch}),
+                 zv({sinYaw * cosPitch, -sinPitch, cosPitch * cosYaw});
+
+    Matrix<T, 4, 4> result = {
+            xv[0], xv[1], xv[2], (-(xv.transpose() * eye))[0],
+            yv[0], yv[1], yv[2], (-(yv.transpose() * eye))[0],
+            zv[0], zv[1], zv[2], (-(zv.transpose() * eye))[0],
+            0, 0, 0, 1
+    };
+
+    return result;
 }
 
 // Matrice per la proiezione prospettica in 3 dimensioni (coordinate omogenee).
@@ -263,7 +285,7 @@ template <typename T> Matrix<T, 4, 4> perspective4(
 			s / aspect_ratio, 0, 0, 0,
 			0, s, 0, 0,
 			0, 0, (far + near) / (near - far), (2 * far * near) / (near - far),
-			0, 0, -1, 0
+            0, 0, -1, 0
 	};
 
 	return result;

@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QOpenGLWidget>
+
 #include "shader.h"
 #include "meshmodel.h"
 #include "meshrenderer.h"
@@ -19,16 +20,30 @@ public Q_SLOTS:
     void updateMesh();
 
 protected:
-    void initializeGL();
-    void resizeGL(int width, int height);
-    void paintGL();
+    void initializeGL() override;
+    void resizeGL(int width, int height) override;
+    void paintGL() override;
+
+    void wheelEvent(QWheelEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
 
 private:
     MeshModel *model;
     MeshRenderer *renderer;
+    BasicShaderProgram *shader;
 
-    // TODO togliere
-    ShaderProgram *test;
+    float near = 0.25, far = 10000, fov = 90, aspect_ratio = 1;
+    Vec3 eye{{0, 0, 0}}, target{{0, 0, 0}}, up{{0, 1, 0}};
+
+    float distance = 1;
+    bool rotating = false;
+    QPointF camera_rotation{M_PI / 2, M_PI / 2};
+    QPoint rotation_start;
+    QPointF camera_rotation_start;
+
+    void update_matrices();
 };
 
 #endif // RENDERWIDGET_H
