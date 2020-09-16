@@ -8,11 +8,13 @@ Shader::Shader(const char *src, bool is_fragment)
     GLint success;
     QOpenGLFunctions *f = QOpenGLContext::currentContext()->functions();
 
+    // Carica e compila lo shader
     shader_id = f->glCreateShader(is_fragment ? GL_FRAGMENT_SHADER : GL_VERTEX_SHADER);
 
     f->glShaderSource(shader_id, 1, &src, NULL);
     f->glCompileShader(shader_id);
 
+    // Verifica se ci sono stati errori nella compilazione
     f->glGetShaderiv(shader_id, GL_COMPILE_STATUS, &success);
 
     if (success == GL_FALSE) {
@@ -49,9 +51,13 @@ ShaderProgram::ShaderProgram(const char *vertex_shader, const char *fragment_sha
     Shader vertex(vertex_shader, false), fragment(fragment_shader, true);
 
     program_id = f->glCreateProgram();
+
+    // Seleziona gli shader e fa il link
     f->glAttachShader(program_id, vertex.get_shader_id());
     f->glAttachShader(program_id, fragment.get_shader_id());
     f->glLinkProgram(program_id);
+
+    // Verifica se ci sono stati errori
 
     f->glGetProgramiv(program_id, GL_LINK_STATUS, &success);
 

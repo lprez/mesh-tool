@@ -8,6 +8,7 @@
 #include "pythonexception.h"
 #include "pythonmesh.h"
 
+// Conversione da stringa Python a wstring STL
 std::wstring pyunicode_to_wstring(PyObject *pystr)
 {
     wchar_t *tmp_str = PyUnicode_AsWideCharString(pystr, NULL);
@@ -18,8 +19,7 @@ std::wstring pyunicode_to_wstring(PyObject *pystr)
 
 PythonPluginContext::PythonPluginContext()
 {
-    // Inizializza l'interprete Python e carica il modulo API
-
+    // Carica il sorgente del modulo API
     QFile apifile(":/python/src/api.py");
 
     if (!apifile.open(QFile::ReadOnly)) {
@@ -31,8 +31,10 @@ PythonPluginContext::PythonPluginContext()
 
     apifile.close();
 
-
+    // Inizializza l'interprete Python
     Py_Initialize();
+
+    // Compila il modulo API
     PyObject *apicode = Py_CompileString(src.toLocal8Bit().constData(), "api.py", Py_file_input);
 
     if (!PyImport_ExecCodeModule("api", apicode)) {
@@ -61,6 +63,8 @@ PythonPlugin *PythonPlugin::load(const char *fname)
 {
     PythonPluginContext::getContext(); // Inizializza l'interprete Python e il modulo
                                        // API se non è stato già fatto.
+
+    // Carica il sorgente del plugin
     std::wstring wfname(fname, fname + strlen(fname));
     QFile pluginfile(fname);
 
@@ -72,7 +76,7 @@ PythonPlugin *PythonPlugin::load(const char *fname)
 
     pluginfile.close();
 
-
+    // Compila il plugin
     PyObject *plugincode = Py_CompileString(src.toLocal8Bit().constData(), fname, Py_file_input);
     PyObject *pluginmodule = PyImport_ExecCodeModule(fname, plugincode);
     PyObject *pluginobject;
@@ -90,6 +94,8 @@ PythonPlugin *PythonPlugin::load(const char *fname)
     }
 
     Py_DECREF(plugincode);
+
+    // Rileva la sottoclasse del plugin
 
     PyObject *modules = PyImport_GetModuleDict(),
              *apimodule = PyMapping_GetItemString(modules, "api"),
@@ -148,6 +154,7 @@ std::wstring PythonPlugin::entry()
     return string_property("entry");
 }
 
+// Converte un attributo del plugin di tipo stringa a una wstring
 std::wstring PythonPlugin::string_property(const char *property)
 {
     return pyunicode_to_wstring(PyObject_GetAttrString(pluginobject, property));
@@ -166,12 +173,14 @@ Mesh PythonTransformer::transform(const Mesh &mesh)
     Mesh result;
     PyObject *args = PyTuple_New(1);
 
+    // Argomenti per la chiamata al plugin (mesh convertita)
     try {
         PyTuple_SetItem(args, 0, mesh_to_pyobject(mesh));
     } catch (PythonException& e) {
         throw PythonPluginException(e, name());
     }
 
+    // Chiamata al plugin
     PyObject *pymesh = PyObject_CallObject(pluginobject, args);
     Py_DECREF(args);
 
@@ -179,6 +188,7 @@ Mesh PythonTransformer::transform(const Mesh &mesh)
         throw PythonPluginException(name(), L"Si è verificato un errore nell'esecuzione del plugin", PyEval_SaveThread());
     }
 
+    // Riconversione della mesh
     try {
         result = pyobject_to_mesh(pymesh);
     } catch (PythonException& e) {
@@ -196,6 +206,7 @@ Mesh PythonImporter::import_from(const char *fname)
     Mesh result;
     PyObject *args = PyTuple_New(1);
 
+    // Argomenti (filename da cui caricare)
     PyTuple_SetItem(args, 0, PyUnicode_FromString(fname));
 
     PyObject *pymesh = PyObject_CallObject(pluginobject, args);
@@ -225,6 +236,8 @@ void PythonExporter::export_to(const Mesh &mesh, const char *fname)
     PyObject *args = PyTuple_New(2);
 
     PyErr_Clear();
+
+    // Argomenti (mesh convertita e filename)
 
     try {
         PyTuple_SetItem(args, 0, mesh_to_pyobject(mesh));

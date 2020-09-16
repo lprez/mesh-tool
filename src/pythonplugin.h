@@ -7,7 +7,7 @@
 #include "pythonexception.h"
 #include "mesh.h"
 
-// Rappresenta il contesto di esecuzione dei plugin Python. Può esservi una sola istanza.
+// Rappresenta il contesto di esecuzione dei plugin Python. Può esservi una sola istanza
 class PythonPluginContext
 {
 public:
@@ -28,7 +28,7 @@ class PythonPlugin
 {
 public:
     // Carica un file .py. Se ritorna null, vuol dire che il codice non contiene un plugin
-    // (es. modulo di utilità importato da altri plugin).
+    // (es. modulo di utilità usato da altri plugin)
     static PythonPlugin *load(const char *fname);
     virtual ~PythonPlugin();
     std::wstring name();
@@ -47,6 +47,7 @@ protected:
     PyObject *pluginobject;
 };
 
+// Plugin di trasformazione (riceve la mesh attuale e ne ritorna una nuova)
 class PythonTransformer : public PythonPlugin
 {
     friend class PythonPlugin;
@@ -57,6 +58,7 @@ private:
 };
 
 
+// Plugin per il caricamento di mesh da un file
 class PythonImporter : public PythonPlugin
 {
     friend class PythonPlugin;
@@ -66,7 +68,7 @@ private:
     PythonImporter(PyObject *plugin) : PythonPlugin(plugin) {}
 };
 
-
+// Plugin per il salvataggio di mesh su file
 class PythonExporter : public PythonPlugin
 {
     friend class PythonPlugin;

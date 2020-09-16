@@ -5,14 +5,18 @@
 #include <initializer_list>
 #include "attributebuffer.h"
 
+// Gestisce un Vertex Array Object (gruppo di attribute buffers)
 class VAO
 {
 public:
     VAO();
     ~VAO();
 
+    // Assegna dei buffer al VAO con indici crescenti a partire da start_index
     void set_attributes(GLuint start_index, std::initializer_list<const AttributeBuffer*> buffers);
-    void draw(GLsizei triangle_count);
+
+    // Seleziona il VAO per il rendering
+    void render(GLsizei triangle_count);
 
     VAO& operator=(const VAO&) = delete;
     VAO(const VAO&) = delete;

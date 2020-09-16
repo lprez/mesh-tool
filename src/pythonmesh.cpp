@@ -3,6 +3,8 @@
 
 #include <map>
 
+// Conversione tra tuple Python e vettori di linear.h
+
 template <unsigned int N> Vector<float, N> pytuple_to_vector(PyObject *pytuple)
 {
     float values[N];
@@ -33,6 +35,8 @@ template <unsigned int N> PyObject *vector_to_pytuple(Vector<float, N> vec)
     return tuple;
 }
 
+// Conversione tra oggetti Vertex Python e C++
+
 Vertex pyobject_to_vertex(PyObject *pyvertex)
 {
     PyObject *pyposition = PyObject_GetAttrString(pyvertex, "position");
@@ -57,6 +61,8 @@ PyObject *vertex_to_pyobject(PyObject *apimodule, const Vertex& vertex)
                         vector_to_pytuple<3>(vertex.position)
     );
 }
+
+// Conversione tra oggetti SubVertex Python e C++
 
 SubVertex pyobject_to_subvertex(PyObject *pysubvertex)
 {
@@ -92,6 +98,8 @@ PyObject *subvertex_to_pyobject(PyObject *apimodule, const SubVertex& subvertex)
     );
 }
 
+// Conversione tra oggetti Mesh Python e C++
+
 Mesh pyobject_to_mesh(PyObject *pymesh)
 {
     std::map<VertexID, Vertex> vertices;
@@ -117,6 +125,8 @@ Mesh pyobject_to_mesh(PyObject *pymesh)
     }
 
     for (Py_ssize_t i = 0; i < PySequence_Size(pyvertices); i++) {
+        // Processa ogni vertice
+
         PyObject *tuple = PySequence_GetItem(pyvertices, i);
 
         if (!tuple) {
@@ -133,6 +143,8 @@ Mesh pyobject_to_mesh(PyObject *pymesh)
     }
 
     for (Py_ssize_t i = 0; i < PySequence_Size(pyfaces); i++) {
+        // Processa ogni faccia
+
         PyObject *tuple = PySequence_GetItem(pyfaces, i);
 
         if (!tuple) {

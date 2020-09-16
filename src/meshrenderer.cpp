@@ -25,5 +25,5 @@ void MeshRenderer::update(const Mesh &mesh)
 void MeshRenderer::render()
 {
     program.use();
-    vao.draw(triangle_count);
+    vao.render(triangle_count);
 }

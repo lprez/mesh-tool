@@ -44,6 +44,7 @@ public:
     Vec3 normal;
 };
 
+// Un triangolo
 class Face {
 public:
     Face(VertexID v1, VertexID v2, VertexID v3) : sv1(v1), sv2(v2), sv3(v3) {}
@@ -76,14 +77,13 @@ public:
     std::vector<float> normal_vector() const;
     std::vector<float> uv_vector() const;
 
+    // Vertici e facce con ID associati
     const std::map<VertexID, Vertex> vertex_map() const { return vertices; }
     const std::map<FaceID, Face> face_map() const { return faces; }
 private:
     std::map<VertexID, Vertex> vertices;
     std::map<FaceID, Face> faces;
     bool smooth;
-
-    void populate_buffers(bool smooth);
 };
 
 #endif /* MESH_H_ */

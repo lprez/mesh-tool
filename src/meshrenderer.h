@@ -12,7 +12,9 @@ class MeshRenderer
 public:
     MeshRenderer(const Mesh& mesh, ShaderProgram& program);
 
+    // Sostituisce con una nuova mesh
     void update(const Mesh& mesh);
+
     void render();
 
 private:

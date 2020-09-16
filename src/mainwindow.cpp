@@ -14,44 +14,20 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-
+    // Geometria della mesh iniziale (un quadrato)
     std::map<VertexID, Vertex> vertices = {
         {0, Vertex({-1, -1, 0})},
         {1, Vertex({1, -1, 0})},
-        {2, Vertex({0, 1, 0})}
-    };
-    std::map<FaceID, Face> faces = {
-        {0, Face(0, 1, 2)}
-    };
-/*
-
-    std::map<VertexID, Vertex> vertices = {
-        {0, Vertex({-1, -1, 0.5}, {0, 0})},
-        {1, Vertex({1, -1, 0.5}, {0, 0})},
-        {2, Vertex({1, 1, 0.5}, {0, 0})},
-        {3, Vertex({-1, 1, 0.5}, {0, 0})}
+        {2, Vertex({1, 1, 0})},
+        {3, Vertex({-1, 1, 0})}
     };
     std::map<FaceID, Face> faces = {
         {0, Face(0, 1, 2)},
         {1, Face(0, 2, 3)}
     };
 
-    std::map<VertexID, Vertex> vertices = {
-        {0, Vertex({-1, -1, 0}, {0, 0})},
-        {1, Vertex({1, -1, 0}, {0, 0})},
-        {2, Vertex({0, 1, 0}, {0, 0})},
-        {3, Vertex({0, 0, -2}, {0, 0})}
-    };
-    std::map<FaceID, Face> faces = {
-        {0, Face(0, 1, 2)},
-        {1, Face(0, 1, 3)},
-        {2, Face(1, 2, 3)},
-        {3, Face(2, 0, 3)}
-    };
-*/
-
-    Mesh tmesh(vertices, faces); // nota: è solo la mesh inizializzatrice, la vera mesh è tenuta da MeshModel
-    mesh_model = new MeshModel(this, tmesh);
+    Mesh initial_mesh(vertices, faces);
+    mesh_model = new MeshModel(this, initial_mesh);
 
     ui->meshView->setModel(mesh_model);
 
@@ -67,6 +43,7 @@ void MainWindow::load_plugins()
 
     QFileInfoList plugin_sources = plugin_directory.entryInfoList(QStringList() << "*.py", QDir::Files);
 
+    // Carica i plugin
     for (QFileInfo plugin_info : plugin_sources) {
         try {
             PythonPlugin *plugin = PythonPlugin::load(plugin_info.canonicalFilePath().toLocal8Bit().data());
@@ -80,6 +57,7 @@ void MainWindow::load_plugins()
         QMessageBox::warning(this, tr(""), tr("Non è stato trovato nessun plugin"));
     }
 
+    // Aggiunge delle sezioni ai menu con titolo "Plugins"
     for (auto menu : {ui->menuFile, ui->menuEdit}) {
         QLabel *plugins_label = new QLabel(tr("<b><i>Plugins</i></b>"));
         plugins_label->setAlignment(Qt::AlignCenter);
@@ -88,10 +66,12 @@ void MainWindow::load_plugins()
         menu->addAction(label_widget);
     }
 
+    // Aggiunge delle azioni alla barra menu per richiamare i plugin
     for (auto plugin : plugins) {
         std::wstring menu_string = plugin->menu();
         QMenu *menu;
 
+        // Il plugin decide su quale menu mettere l'azione
         if (menu_string == std::wstring(L"File")) {
             menu = ui->menuFile;
         } else { // if (menu_string == std::wstring(L"Modifica")) {
@@ -100,6 +80,7 @@ void MainWindow::load_plugins()
 
         QAction *action = new QAction(QIcon(), QString::fromWCharArray(plugin->entry().c_str()), menu);
 
+        // Callback dei segnali delle azioni
         if (PythonTransformer* plugin_transformer = dynamic_cast<PythonTransformer*>(plugin)) {
             connect(action, &QAction::triggered, this, [=]() mutable {
                 try {

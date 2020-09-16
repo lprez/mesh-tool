@@ -39,7 +39,7 @@ FORMS += \
     src/mainwindow.ui
 
 CONFIG += no_keywords
-QMAKE_CXXFLAGS += -fsplit-stack
+QMAKE_CXXFLAGS += -Wno-deprecated-copy
 QMAKE_CXXFLAGS += $$system(python3-config --cflags)
 QMAKE_LFLAGS += $$system(python3-config --ldflags --embed)
 INCLUDEPATH += $$system(python3-config --includes)
@@ -57,6 +57,7 @@ RESOURCES += \
     resources.qrc
 
 DISTFILES += \
+    README.txt \
     plugins/catmullclark.py \
     plugins/exportobj.py \
     plugins/importobj.py \
@@ -69,7 +70,7 @@ DISTFILES += \
 UI_DIR = src
 
 # Copia i plugin dalla cartella sorgente a quella di build.
-copyplugins.commands = $(COPY_DIR) $$PWD/plugins/* $$OUT_PWD/plugins/
+copyplugins.commands = $(MKDIR) -p $$OUT_PWD/plugins/ ; $(COPY_DIR) $$PWD/plugins/* $$OUT_PWD/plugins/
 first.depends = $(first) copyplugins
 export(first.depends)
 export(copyplugins.commands)

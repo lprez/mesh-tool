@@ -43,7 +43,8 @@ void Mesh::recalculate_normals()
         Vec3 face_normal = Face::surface_normal(vertices.at(it->second.sv1.vertex_id),
                                                 vertices.at(it->second.sv2.vertex_id),
                                                 vertices.at(it->second.sv3.vertex_id));
-
+        // Se è richiesto lo smooth shading, le normali vengono raccolte e associate ad ogni
+        // vertice, altrimenti vengono direttamente aggiunte al sottovertice
         if (smooth) {
             for (SubVertex subvertex : {it->second.sv1, it->second.sv2, it->second.sv3}) {
                 if (smooth) {
@@ -66,6 +67,7 @@ void Mesh::recalculate_normals()
 
 
     if (smooth) {
+        // Aggiunge al sottovertice la media delle normali precedentemente calcolate
         for (auto it = faces.begin(); it != faces.end(); it++) {
             for (SubVertex *subvertex : {&it->second.sv1, &it->second.sv2, &it->second.sv3}) {
                 Vec3 normal = normal_sums[subvertex->vertex_id] * (1 / normal_div[subvertex->vertex_id]);

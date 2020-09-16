@@ -34,7 +34,9 @@ private:
     MeshRenderer *renderer;
     BasicShaderProgram *shader;
 
+    // Parametri della prospettiva
     float near = 0.25, far = 10000, fov = 90, aspect_ratio = 1;
+    // Parametri della vista
     Vec3 eye{{0, 0, 0}}, target{{0, 0, 0}}, up{{0, 1, 0}};
 
     float distance = 1;
@@ -43,6 +45,7 @@ private:
     QPoint rotation_start;
     QPointF camera_rotation_start;
 
+    // Aggiorna le matrici di trasformazione, vista e prospettiva
     void update_matrices();
 };
 

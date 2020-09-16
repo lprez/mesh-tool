@@ -5,6 +5,7 @@
 #include <GL/gl.h>
 #include "linear.h"
 
+// Gestisce gli shader OpenGL
 class Shader
 {
 friend class ShaderProgram;
@@ -24,11 +25,16 @@ private:
     GLuint shader_id;
 };
 
+// Gestisce i programmi OpenGL. Di per sè non permette di impostare gli uniform,
+// che potrebbero cambiare da programma a programma. Sono le classi derivate
+// a definire quali uniform sono disponibili e fornire i metodi per impostarli
 class ShaderProgram
 {
 public:
     ShaderProgram(const char *vertex_shader, const char *fragment_shader);
     ~ShaderProgram();
+
+    // Seleziona il programma per usarlo nel rendering
     void use() const;
 
     ShaderProgram& operator=(const ShaderProgram&) = delete;
@@ -38,11 +44,13 @@ protected:
     GLuint get_program_id() const {return program_id;}
 
 private:
+    // ID di questo programma
     GLuint program_id;
+    // ID del programma attualmente in uso
     static GLuint current_program_id;
 };
 
-// Rappresenta uno shader con uniform rappresentanti le matrici
+// Rappresenta uno shader program che usa uniform rappresentanti le matrici
 // di trasformazione, vista e proiezione
 class BasicShaderProgram : public ShaderProgram
 {

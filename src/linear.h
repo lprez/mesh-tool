@@ -220,8 +220,6 @@ Matrix<T, rows, columns> operator*(const T& scale, const Matrix<T, rows, columns
 	return mat * scale;
 }
 
-// TODO: spostare in un altro modulo:
-
 // Prodotto vettoriale in 3 dimensioni.
 template <typename T> Vector<T, 3> cross3(const Vector<T, 3>& vec1, const Vector<T, 3>& vec2)
 {

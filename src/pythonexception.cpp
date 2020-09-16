@@ -8,6 +8,7 @@ PythonException::PythonException(const std::wstring message, PyThreadState *thre
     if (thread_state != nullptr) {
         PyEval_RestoreThread(thread_state);
 
+        // Catch dell'eccezione Python con raccolta delle informazioni
         PyObject *pytype, *pyvalue, *pytraceback;
         PyErr_Fetch(&pytype, &pyvalue, &pytraceback);
 
@@ -15,6 +16,7 @@ PythonException::PythonException(const std::wstring message, PyThreadState *thre
             PyErr_NormalizeException(&pytype, &pyvalue, &pytraceback);
 
             if (pyvalue != nullptr) {
+                // Aggiunge il messaggio dell'eccezione Python al resto
                 this->wmessage.append(L"\n");
 
                 wchar_t *errstr = PyUnicode_AsWideCharString(PyObject_Repr(pyvalue), NULL);
