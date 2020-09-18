@@ -14,10 +14,10 @@ class MeshView : public QOpenGLWidget
 public:
     MeshView(QWidget *parent = 0);
     ~MeshView();
-    void setModel(MeshModel *model);
+    void set_model(MeshModel *model);
 
 public Q_SLOTS:
-    void updateMesh();
+    void update_mesh();
 
 protected:
     void initializeGL() override;
@@ -35,7 +35,7 @@ private:
     BasicShaderProgram *shader;
 
     // Parametri della prospettiva
-    float near = 0.25, far = 10000, fov = 90, aspect_ratio = 1;
+    float near_plane = 0.25, far_plane = 10000, fov = 90, aspect_ratio = 1;
     // Parametri della vista
     Vec3 eye{{0, 0, 0}}, target{{0, 0, 0}}, up{{0, 1, 0}};
 

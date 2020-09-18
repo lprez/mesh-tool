@@ -39,10 +39,18 @@ FORMS += \
     src/mainwindow.ui
 
 CONFIG += no_keywords
-QMAKE_CXXFLAGS += -Wno-deprecated-copy
-QMAKE_CXXFLAGS += $$system(python3-config --cflags)
-QMAKE_LFLAGS += $$system(python3-config --ldflags --embed)
-INCLUDEPATH += $$system(python3-config --includes)
+
+win32 {
+    QMAKE_CXXFLAGS += -I$$(PYTHONPATH)\include -D_USE_MATH_DEFINES
+    QMAKE_LFLAGS += -L$$(PYTHONPATH) -lpython38
+}
+
+unix {
+    QMAKE_CXXFLAGS += $$system(python3-config --cflags)
+    QMAKE_CXXFLAGS += -Wno-deprecated-copy
+    QMAKE_LFLAGS += $$system(python3-config --ldflags --embed)
+    INCLUDEPATH += $$system(python3-config --includes)
+}
 
 #debug {
 #    QMAKE_CXXFLAGS -= -O3
@@ -70,8 +78,25 @@ DISTFILES += \
 UI_DIR = src
 
 # Copia i plugin dalla cartella sorgente a quella di build.
-copyplugins.commands = $(MKDIR) -p $$OUT_PWD/plugins/ ; $(COPY_DIR) $$PWD/plugins/* $$OUT_PWD/plugins/
+unix {
+    copyplugins.commands = $(MKDIR) -p $$OUT_PWD/plugins/ ; $(COPY_DIR) $$PWD/plugins/* $$OUT_PWD/plugins/
+}
+
 first.depends = $(first) copyplugins
 export(first.depends)
 export(copyplugins.commands)
 QMAKE_EXTRA_TARGETS += first copyplugins
+
+
+win32 {
+    CONFIG(debug,debug|release) {
+        dlls.path = $${OUT_PWD}/debug
+    } else {
+        dlls.path = $${OUT_PWD}/release
+    }
+    dlls.files += $$[QT_INSTALL_BINS]/Qt5Core.dll
+    dlls.files += $$[QT_INSTALL_BINS]/Qt5Gui.dll
+    dlls.files += $$[QT_INSTALL_BINS]/Qt5Widgets.dll
+    dlls.files += $$[QT_INSTALL_BINS]/libEGL.dll
+    INSTALLS += dlls
+}

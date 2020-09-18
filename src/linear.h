@@ -275,14 +275,14 @@ template <typename T> Matrix<T, 4, 4> camera4(const Vector<T, 3>& eye, float pit
 
 // Matrice per la proiezione prospettica in 3 dimensioni (coordinate omogenee).
 template <typename T> Matrix<T, 4, 4> perspective4(
-		const T& near, const T& far, const T& fov, const T& aspect_ratio)
+        const T& near_plane, const T& far_plane, const T& fov, const T& aspect_ratio)
 {
 	T s = 1 / std::tan(fov * T(M_PI) / 360);
 
 	Matrix<T, 4, 4> result = {
 			s / aspect_ratio, 0, 0, 0,
 			0, s, 0, 0,
-			0, 0, (far + near) / (near - far), (2 * far * near) / (near - far),
+            0, 0, (far_plane + near_plane) / (near_plane - far_plane), (2 * far_plane * near_plane) / (near_plane - far_plane),
             0, 0, -1, 0
 	};
 
@@ -291,12 +291,12 @@ template <typename T> Matrix<T, 4, 4> perspective4(
 
 // Matrice per la proiezione ortogonale in 3 dimensioni (coordinate omogenee).
 template <typename T> Matrix<T, 4, 4> ortho4(
-		const T& near, const T& far, const T& left, const T& right, const T& bottom, const T& top)
+        const T& near_plane, const T& far_plane, const T& left, const T& right, const T& bottom, const T& top)
 {
 	Matrix<T, 4, 4> result = {
 			2 / (right - left), 0, 0, (right + left) / (right - left),
 			0, 2 / (top - bottom), 0, (top + bottom) / (top - bottom),
-			0, 0, 2 / (near - far), (near + far) / (near - far)
+            0, 0, 2 / (near_plane - far_plane), (near_plane + far_plane) / (near_plane - far_plane)
 	};
 
 	return result;

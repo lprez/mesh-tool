@@ -18,7 +18,15 @@ public:
     ~MainWindow();
     
 public Q_SLOTS:
+    // Lanciata quando si clicca su "Ricalcola normali"
     void on_recalculate_normals();
+    // Lanciata quando si clicca su "Smooth shading"
+    void on_smooth_shading();
+    // Lanciata quando si clicca su "Flat shading"
+    void on_flat_shading();
+
+    // Lanciata quando si riceve il segnale mesh_changed
+    void on_mesh_changed();
 
 private:
     void load_plugins();

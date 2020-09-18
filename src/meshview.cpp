@@ -22,15 +22,15 @@ MeshView::~MeshView() {
     delete renderer;
 }
 
-void MeshView::setModel(MeshModel *model)
+void MeshView::set_model(MeshModel *model)
 {
     this->model = model;
-    connect(model, &MeshModel::meshChanged, this, &MeshView::updateMesh);
+    connect(model, &MeshModel::mesh_changed, this, &MeshView::update_mesh);
 }
 
-void MeshView::updateMesh()
+void MeshView::update_mesh()
 {
-    renderer->update(model->getMesh());
+    renderer->update(model->get_mesh());
     update();
 }
 
@@ -78,7 +78,7 @@ void MeshView::initializeGL()
                 "proj_matrix"
                 );
 
-    renderer = new MeshRenderer(model->getMesh(), *shader);
+    renderer = new MeshRenderer(model->get_mesh(), *shader);
 }
 
 void MeshView::resizeGL(int width, int height)
@@ -145,25 +145,25 @@ void MeshView::mouseMoveEvent(QMouseEvent *event)
         // Sposta il cursore dal lato opposto quando si raggiungono i bordi
 
         if (event->x() < 0) {
-            rotation_start = QPoint(width() + event->x(), rotation_start.y());
+            rotation_start = QPoint(width() + event->x(), event->y());
             camera_rotation_start = camera_rotation;
             QCursor::setPos(mapToGlobal(QPoint(width(), event->y())));
         }
 
         if (event->x() > width()) {
-            rotation_start = QPoint(event->x() - width(), rotation_start.y());
+            rotation_start = QPoint(event->x() - width(), event->y());
             camera_rotation_start = camera_rotation;
             QCursor::setPos(mapToGlobal(QPoint(0, event->y())));
         }
 
         if (event->y() < 0) {
-            rotation_start = QPoint(rotation_start.x(), height() + event->y());
+            rotation_start = QPoint(event->x(), height() + event->y());
             camera_rotation_start = camera_rotation;
             QCursor::setPos(mapToGlobal(QPoint(event->x(), height())));
         }
 
         if (event->y() > height()) {
-            rotation_start = QPoint(rotation_start.x(), event->y() - height());
+            rotation_start = QPoint(event->x(), event->y() - height());
             camera_rotation_start = camera_rotation;
             QCursor::setPos(mapToGlobal(QPoint(event->x(), 0)));
         }
@@ -198,6 +198,6 @@ void MeshView::update_matrices()
 
     shader->set_model_matrix(Matrix<float, 4, 4>::translation({0, 0, 0}) * Matrix<float, 4, 4>::scale(1));
     shader->set_view_matrix(look_at4(eye + rot_eye, target, up));
-    shader->set_proj_matrix(perspective4(near, far, fov, aspect_ratio));
+    shader->set_proj_matrix(perspective4(near_plane, far_plane, fov, aspect_ratio));
 }
 

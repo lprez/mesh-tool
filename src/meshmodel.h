@@ -15,11 +15,12 @@ public:
     // Sostituisce con una nuova mesh
     void replace(const Mesh& new_mesh);
 
+    void set_smooth(bool smooth, bool recalculate_normals = true);
     void recalculate_normals() { mesh.recalculate_normals(); }
-    const Mesh& getMesh() {return mesh;}
+    const Mesh& get_mesh() {return mesh;}
 
 Q_SIGNALS:
-    void meshChanged();
+    void mesh_changed();
 
 private:
     Mesh mesh;

@@ -63,6 +63,8 @@ class ImportOBJPlugin(ImporterPlugin):
                     elif command == "s":
                         if args[0] == "off":
                             smooth = False
+                        else:
+                            smooth = True
                     elif command.startswith("v"):
                         coords = [float(coord) for coord in args]
                         if command == "v":

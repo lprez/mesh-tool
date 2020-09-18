@@ -42,6 +42,8 @@
      <string>Modifica</string>
     </property>
     <addaction name="action_recalculate_normals"/>
+    <addaction name="action_smooth_shading"/>
+    <addaction name="action_flat_shading"/>
     <addaction name="separator"/>
    </widget>
    <addaction name="menuFile"/>
@@ -63,6 +65,16 @@
      <italic>true</italic>
      <bold>true</bold>
     </font>
+   </property>
+  </action>
+  <action name="action_smooth_shading">
+   <property name="text">
+    <string>Smooth shading</string>
+   </property>
+  </action>
+  <action name="action_flat_shading">
+   <property name="text">
+    <string>Flat shading</string>
    </property>
   </action>
  </widget>
@@ -91,8 +103,42 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>action_flat_shading</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>on_flat_shading()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>action_smooth_shading</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>on_smooth_shading()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>on_recalculate_normals()</slot>
+  <slot>on_flat_shading()</slot>
+  <slot>on_smooth_shading()</slot>
  </slots>
 </ui>
