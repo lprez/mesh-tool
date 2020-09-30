@@ -4,7 +4,8 @@
 #include <string>
 #include <QFileDialog>
 #include <QLabel>
-#include <QWidgetAction>#include <QDir>
+#include <QWidgetAction>
+#include <QDir>
 
 #include <QMessageBox>
 

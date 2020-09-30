@@ -9,7 +9,6 @@
 #include "mesh.h"
 #include "meshrenderer.h"
 
-// TODO togliere
 #include <QTextStream>
 #include <QFile>
 
