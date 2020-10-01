@@ -48,17 +48,14 @@ void Mesh::recalculate_normals()
         // vertice, altrimenti vengono direttamente aggiunte al sottovertice
         if (smooth) {
             for (SubVertex subvertex : {it->second.sv1, it->second.sv2, it->second.sv3}) {
-                if (smooth) {
-                    auto previous_normal = normal_sums.find(subvertex.vertex_id);
+                auto previous_normal = normal_sums.find(subvertex.vertex_id);
 
-                    if (previous_normal != normal_sums.end()) {
-                        face_normal = face_normal + previous_normal->first;
-                        normal_div[subvertex.vertex_id] += 1;
-                    } else {
-                        normal_div[subvertex.vertex_id] = 1;
-                    }
-
+                if (previous_normal != normal_sums.end()) {
+                    normal_sums[subvertex.vertex_id] = face_normal + previous_normal->second;;
+                    normal_div[subvertex.vertex_id] += 1;
+                } else {
                     normal_sums[subvertex.vertex_id] = face_normal;
+                    normal_div[subvertex.vertex_id] = 1;
                 }
             }
         } else {

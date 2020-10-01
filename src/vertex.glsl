@@ -13,6 +13,6 @@ out vec4 int_eye;
 
 void main() {
     int_normal = vec3(transpose(inverse(view_matrix * model_matrix)) * vec4(normal, 0.0));
-    int_eye = - (view_matrix * model_matrix * vec4(position + vec3(0.5), 1.0));
+    int_eye = - (view_matrix * model_matrix * vec4(position, 1.0));
     gl_Position =  proj_matrix * view_matrix * model_matrix * vec4(position, 1.0);
 }
