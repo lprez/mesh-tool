@@ -6,22 +6,56 @@
 #include "vao.h"
 #include "shader.h"
 
-// Contiene lo stato necessario al rendering di una Mesh
-class MeshRenderer
+// Gestisce i buffer nella GPU associati alla mesh
+class MeshBuffers
 {
 public:
-    MeshRenderer(const Mesh& mesh, ShaderProgram& program);
+    MeshBuffers(const Mesh& mesh);
 
     // Sostituisce con una nuova mesh
     void update(const Mesh& mesh);
 
-    void render();
+    const AttributeBuffer & position_buffer() const { return positions; }
+    const AttributeBuffer & normal_buffer() const { return normals; }
+    const AttributeBuffer & uv_buffer() const { return uvs; }
+    const AttributeBuffer & vertex_id_buffer() const { return vertex_ids; }
+
+    // Numero di triangoli
+    unsigned int triangle_count() const { return elems; }
 
 private:
-    ShaderProgram &program;
-    VAO vao;
-    AttributeBuffer position_buffer, normal_buffer, uv_buffer;
-    unsigned int triangle_count;
+    AttributeBuffer positions, normals, uvs, vertex_ids;
+    unsigned int elems;
 };
+
+// Contiene lo stato necessario al rendering di una Mesh
+class MeshRenderer
+{
+public:
+    void render(bool points = false);
+
+protected:
+    MeshRenderer(const MeshBuffers& mesh_buffers, const ShaderProgram& program) :
+        buffers(mesh_buffers), program(program) {}
+
+    const MeshBuffers &buffers;
+    const ShaderProgram &program;
+    VAO vao;
+};
+
+// Renderer per la vista
+class MeshRendererView : public MeshRenderer
+{
+public:
+    MeshRendererView(const MeshBuffers& mesh, const ShaderProgram& program);
+};
+
+// Renderer per il 3D picking
+class MeshRendererPick : public MeshRenderer
+{
+public:
+    MeshRendererPick(const MeshBuffers& mesh, const ShaderProgram& program);
+};
+
 
 #endif // MESHVIEW_H

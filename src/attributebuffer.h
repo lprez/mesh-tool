@@ -8,7 +8,8 @@
 class AttributeBuffer
 {
 public:
-    AttributeBuffer(const GLenum type, const GLint component_size, const void *data = nullptr, size_t len = 0);
+    AttributeBuffer(const GLenum type, const GLint component_size,
+                    const void *data = nullptr, size_t len = 0);
     ~AttributeBuffer();
 
     // Ricarica il buffer con dei nuovi dati

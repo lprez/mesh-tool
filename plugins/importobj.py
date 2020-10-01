@@ -25,6 +25,7 @@ class ImportOBJPlugin(ImporterPlugin):
         uvs = [(0.0, 0.0)]
         faces = []
         smooth = True
+        recalculate_normals = False
 
         vertices = []
         faces = []
@@ -64,7 +65,7 @@ class ImportOBJPlugin(ImporterPlugin):
                         if args[0] == "off":
                             smooth = False
                         else:
-                            smooth = True
+                            recalculate_normals = True
                     elif command.startswith("v"):
                         coords = [float(coord) for coord in args]
                         if command == "v":
@@ -74,6 +75,6 @@ class ImportOBJPlugin(ImporterPlugin):
                         else:
                             normals.append(tuple(resize_list(coords, 3)))
 
-        return Mesh(dict(enumerate(vertices)), dict(enumerate(faces)), smooth, False)
+        return Mesh(dict(enumerate(vertices)), dict(enumerate(faces)), smooth, recalculate_normals)
 
 plugin = ImportOBJPlugin("Importa OBJ", "File", "Importa OBJ")

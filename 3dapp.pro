@@ -9,6 +9,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     src/attributebuffer.cpp \
+    src/framebuffer.cpp \
     src/main.cpp \
     src/mainwindow.cpp \
     src/mesh.cpp \
@@ -23,6 +24,7 @@ SOURCES += \
 
 HEADERS += \
     src/attributebuffer.h \
+    src/framebuffer.h \
     src/linear.h \
     src/mainwindow.h \
     src/mesh.h \
@@ -73,7 +75,9 @@ DISTFILES += \
     plugins/subdivision_utils.py \
     src/api.py \
     src/fragment.glsl \
-    src/vertex.glsl
+    src/fragment_pick.glsl \
+    src/vertex.glsl \
+    src/vertex_pick.glsl
 
 UI_DIR = src
 

@@ -16,7 +16,7 @@ public:
     void set_attributes(GLuint start_index, std::initializer_list<const AttributeBuffer*> buffers);
 
     // Seleziona il VAO per il rendering
-    void render(GLsizei triangle_count);
+    void render(GLsizei triangle_count, bool points = false);
 
     VAO& operator=(const VAO&) = delete;
     VAO(const VAO&) = delete;

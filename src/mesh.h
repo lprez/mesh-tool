@@ -23,6 +23,7 @@ using FaceID = uint32_t;
 // Rappresenta un vertice (in senso geometrico)
 class Vertex {
 public:
+    Vertex() {}
     Vertex(Vec3 position) : position(position) {}
 
     Vec3 position;
@@ -63,7 +64,8 @@ public:
 class Mesh {
 public:
     Mesh() : vertices(std::map<VertexID, Vertex>()), faces(std::map<FaceID, Face>()), smooth(false) {}
-    Mesh(const std::map<VertexID, Vertex>& vertices, const std::map<FaceID, Face>& faces, bool smooth = false, bool recalculate_normals = true);
+    Mesh(const std::map<VertexID, Vertex>& vertices, const std::map<FaceID, Face>& faces,
+         bool smooth = false, bool recalculate_normals = true);
 
     // Ricalcola le normali dei SubVertex
     void recalculate_normals();
@@ -72,10 +74,15 @@ public:
     void set_smooth(bool smooth, bool recalculate_normals = true);
     bool is_smooth() const { return smooth; }
 
+    // Operazioni sui vertici
+    void set_vertex(VertexID id, Vertex vertex) { vertices[id] = vertex; }
+    void remove_vertex(VertexID id) { vertices.erase(id); }
+
     // Genera un vettore con tutte le posizioni usate da tutte le facce
     std::vector<float> position_vector() const;
     std::vector<float> normal_vector() const;
     std::vector<float> uv_vector() const;
+    std::vector<VertexID> vertex_id_vector() const;
 
     // Vertici e facce con ID associati
     const std::map<VertexID, Vertex> vertex_map() const { return vertices; }

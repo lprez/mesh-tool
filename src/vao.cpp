@@ -31,12 +31,12 @@ void VAO::set_attributes(GLuint index, std::initializer_list<const AttributeBuff
     f->glBindVertexArray(0);
 }
 
-void VAO::render(GLsizei count)
+void VAO::render(GLsizei count, bool points)
 {
     QOpenGLFunctions_4_5_Core *f = QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_4_5_Core>();
 
     f->glBindVertexArray(vao_id);
-    f->glDrawArrays(GL_TRIANGLES, 0, count);
+    f->glDrawArrays(points ? GL_POINTS : GL_TRIANGLES, 0, count);
     f->glBindVertexArray(0);
 }
 

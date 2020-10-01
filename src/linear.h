@@ -302,4 +302,56 @@ template <typename T> Matrix<T, 4, 4> ortho4(
     return result;
 }
 
+// Inverte una matrice 4x4.
+template <typename T> Matrix<T, 4, 4> invert4(Matrix<T, 4, 4> m)
+{
+    // Determinanti delle sottomatrici 2x2
+    float det2323 = m(2, 2) * m(3, 3) - m(2, 3) * m(3, 2);
+    float det1323 = m(2, 1) * m(3, 3) - m(2, 3) * m(3, 1);
+    float det1223 = m(2, 1) * m(3, 2) - m(2, 2) * m(3, 1);
+    float det0323 = m(2, 0) * m(3, 3) - m(2, 3) * m(3, 0);
+    float det0223 = m(2, 0) * m(3, 2) - m(2, 2) * m(3, 0);
+    float det0123 = m(2, 0) * m(3, 1) - m(2, 1) * m(3, 0);
+    float det2313 = m(1, 2) * m(3, 3) - m(1, 3) * m(3, 2);
+    float det1313 = m(1, 1) * m(3, 3) - m(1, 3) * m(3, 1);
+    float det1213 = m(1, 1) * m(3, 2) - m(1, 2) * m(3, 1);
+    float det2312 = m(1, 2) * m(2, 3) - m(1, 3) * m(2, 2);
+    float det1312 = m(1, 1) * m(2, 3) - m(1, 3) * m(2, 1);
+    float det1212 = m(1, 1) * m(2, 2) - m(1, 2) * m(2, 1);
+    float det0313 = m(1, 0) * m(3, 3) - m(1, 3) * m(3, 0);
+    float det0213 = m(1, 0) * m(3, 2) - m(1, 2) * m(3, 0);
+    float det0312 = m(1, 0) * m(2, 3) - m(1, 3) * m(2, 0);
+    float det0212 = m(1, 0) * m(2, 2) - m(1, 2) * m(2, 0);
+    float det0113 = m(1, 0) * m(3, 1) - m(1, 1) * m(3, 0);
+    float det0112 = m(1, 0) * m(2, 1) - m(1, 1) * m(2, 0);
+
+    // Determinante della matrice
+    float det = m(0, 0) * (m(1, 1) * det2323 - m(1, 2) * det1323 + m(1, 3) * det1223) -
+                m(0, 1) * (m(1, 0) * det2323 - m(1, 2) * det0323 + m(1, 3) * det0223) +
+                m(0, 2) * (m(1, 0) * det1323 - m(1, 1) * det0323 + m(1, 3) * det0123) -
+                m(0, 3) * (m(1, 0) * det1223 - m(1, 1) * det0223 + m(1, 2) * det0123);
+    det = 1 / det;
+
+    Matrix<T, 4, 4> result = {
+       det *  (m(1, 1) * det2323 - m(1, 2) * det1323 + m(1, 3) * det1223),
+       det * -(m(0, 1) * det2323 - m(0, 2) * det1323 + m(0, 3) * det1223),
+       det *  (m(0, 1) * det2313 - m(0, 2) * det1313 + m(0, 3) * det1213),
+       det * -(m(0, 1) * det2312 - m(0, 2) * det1312 + m(0, 3) * det1212),
+       det * -(m(1, 0) * det2323 - m(1, 2) * det0323 + m(1, 3) * det0223),
+       det *  (m(0, 0) * det2323 - m(0, 2) * det0323 + m(0, 3) * det0223),
+       det * -(m(0, 0) * det2313 - m(0, 2) * det0313 + m(0, 3) * det0213),
+       det *  (m(0, 0) * det2312 - m(0, 2) * det0312 + m(0, 3) * det0212),
+       det *  (m(1, 0) * det1323 - m(1, 1) * det0323 + m(1, 3) * det0123),
+       det * -(m(0, 0) * det1323 - m(0, 1) * det0323 + m(0, 3) * det0123),
+       det *  (m(0, 0) * det1313 - m(0, 1) * det0313 + m(0, 3) * det0113),
+       det * -(m(0, 0) * det1312 - m(0, 1) * det0312 + m(0, 3) * det0112),
+       det * -(m(1, 0) * det1223 - m(1, 1) * det0223 + m(1, 2) * det0123),
+       det *  (m(0, 0) * det1223 - m(0, 1) * det0223 + m(0, 2) * det0123),
+       det * -(m(0, 0) * det1213 - m(0, 1) * det0213 + m(0, 2) * det0113),
+       det *  (m(0, 0) * det1212 - m(0, 1) * det0212 + m(0, 2) * det0112)
+    };
+
+    return result;
+}
+
 #endif /* LINEAR_H_ */

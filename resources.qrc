@@ -5,5 +5,7 @@
     <qresource prefix="/glsl">
         <file>src/fragment.glsl</file>
         <file>src/vertex.glsl</file>
+        <file>src/vertex_pick.glsl</file>
+        <file>src/fragment_pick.glsl</file>
     </qresource>
 </RCC>

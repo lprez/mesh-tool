@@ -28,7 +28,8 @@ void Face::set_normals(Vec3 n1, Vec3 n2, Vec3 n3)
     sv3.normal = n3;
 }
 
-Mesh::Mesh(const std::map<VertexID, Vertex> &vertices, const std::map<FaceID, Face> &faces, bool smooth, bool recalculate)
+Mesh::Mesh(const std::map<VertexID, Vertex> &vertices, const std::map<FaceID, Face> &faces,
+           bool smooth, bool recalculate)
     : vertices(vertices), faces(faces), smooth(smooth)
 {
     if (recalculate) recalculate_normals();
@@ -127,4 +128,17 @@ std::vector<float> Mesh::uv_vector() const
     }
 
     return uvs;
+}
+
+std::vector<VertexID> Mesh::vertex_id_vector() const
+{
+    std::vector<VertexID> ids;
+
+    for (auto it = faces.begin(); it != faces.end(); it++) {
+        for (SubVertex subvertex : {it->second.sv1, it->second.sv2, it->second.sv3}) {
+            ids.push_back(subvertex.vertex_id);
+        }
+    }
+
+    return ids;
 }
